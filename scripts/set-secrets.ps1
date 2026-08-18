@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 # Reads .env and uploads all secrets to GitHub Actions repository secrets
 
-$envFile = Join-Path $PSScriptRoot ".." ".env"
+$envFile = "$PSScriptRoot\..\.env"
 if (-not (Test-Path $envFile)) {
     Write-Error ".env file not found. Create one from the template."
     exit 1

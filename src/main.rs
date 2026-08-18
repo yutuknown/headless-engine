@@ -96,8 +96,19 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Mode 3: Direct CLI Execution
-    let target = cli.target.unwrap_or_else(|| "https://news.ycombinator.com".to_string());
-    execute_target(&target, profile, cli.proxy.as_deref(), cli.timeout, cli.markdown, cli.search, cli.json).await
+    let target = cli
+        .target
+        .unwrap_or_else(|| "https://news.ycombinator.com".to_string());
+    execute_target(
+        &target,
+        profile,
+        cli.proxy.as_deref(),
+        cli.timeout,
+        cli.markdown,
+        cli.search,
+        cli.json,
+    )
+    .await
 }
 
 fn parse_profile(s: &str) -> DeviceProfile {
@@ -129,11 +140,15 @@ async fn execute_target(
 
     let mut tab = builder.build()?;
 
-    let target_url = if search_mode && !target.starts_with("http://") && !target.starts_with("https://") {
-        format!("https://www.google.com/search?q={}", urlencoding_simple(target))
-    } else {
-        target.to_string()
-    };
+    let target_url =
+        if search_mode && !target.starts_with("http://") && !target.starts_with("https://") {
+            format!(
+                "https://www.google.com/search?q={}",
+                urlencoding_simple(target)
+            )
+        } else {
+            target.to_string()
+        };
 
     let start = Instant::now();
     let report = tab.navigate(&target_url).await?;
@@ -257,7 +272,9 @@ async fn run_interactive_repl(
 ) -> anyhow::Result<()> {
     eprintln!();
     eprintln!("  \x1b[1;38;5;39mheadless-engine\x1b[0m \x1b[38;5;244mv1.0.0\x1b[0m");
-    eprintln!("  \x1b[38;5;248mPure-Rust Headless Browser Engine for AI Agents & Web Scraping\x1b[0m");
+    eprintln!(
+        "  \x1b[38;5;248mPure-Rust Headless Browser Engine for AI Agents & Web Scraping\x1b[0m"
+    );
     eprintln!("  \x1b[38;5;244mType a URL, search query, or /help. Type /exit to quit.\x1b[0m");
     eprintln!();
 
@@ -278,7 +295,12 @@ async fn run_interactive_repl(
             continue;
         }
 
-        if input == "exit" || input == "quit" || input == "/exit" || input == "/quit" || input == "q" {
+        if input == "exit"
+            || input == "quit"
+            || input == "/exit"
+            || input == "/quit"
+            || input == "q"
+        {
             eprintln!("  \x1b[38;5;244mGoodbye.\x1b[0m\n");
             break;
         }
@@ -291,8 +313,12 @@ async fn run_interactive_repl(
         if input == "/help" || input == "help" || input == "?" {
             eprintln!();
             eprintln!("  \x1b[1mCommands:\x1b[0m");
-            eprintln!("    \x1b[38;5;39m<url>\x1b[0m               Navigate and extract page structure");
-            eprintln!("    \x1b[38;5;39m/search <query>\x1b[0m     Search and extract SERP entities");
+            eprintln!(
+                "    \x1b[38;5;39m<url>\x1b[0m               Navigate and extract page structure"
+            );
+            eprintln!(
+                "    \x1b[38;5;39m/search <query>\x1b[0m     Search and extract SERP entities"
+            );
             eprintln!("    \x1b[38;5;39m/profile <name>\x1b[0m     Switch profile (chrome-windows, safari-ios, android)");
             eprintln!("    \x1b[38;5;39m/markdown <url>\x1b[0m     Dump complete LLM markdown");
             eprintln!("    \x1b[38;5;39m/clear\x1b[0m              Clear terminal screen");
@@ -301,10 +327,13 @@ async fn run_interactive_repl(
             continue;
         }
 
-        if input.starts_with("/profile ") {
-            let p_str = input["/profile ".len()..].trim();
+        if let Some(p_str) = input.strip_prefix("/profile ") {
+            let p_str = p_str.trim();
             current_profile = parse_profile(p_str);
-            eprintln!("  \x1b[32m✓\x1b[0m Active profile: \x1b[1m{:?}\x1b[0m\n", current_profile);
+            eprintln!(
+                "  \x1b[32m✓\x1b[0m Active profile: \x1b[1m{:?}\x1b[0m\n",
+                current_profile
+            );
             continue;
         }
 
@@ -321,7 +350,10 @@ async fn run_interactive_repl(
 
         let target_url = if !target.starts_with("http://") && !target.starts_with("https://") {
             if is_search {
-                format!("https://www.google.com/search?q={}", urlencoding_simple(target))
+                format!(
+                    "https://www.google.com/search?q={}",
+                    urlencoding_simple(target)
+                )
             } else {
                 format!("https://{}", target)
             }

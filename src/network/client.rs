@@ -65,8 +65,14 @@ impl NetworkClient {
         // StealthGuard: Pre-warm legitimate session and consent cookies
         if let Ok(google_url) = "https://www.google.com".parse::<reqwest::Url>() {
             cookie_jar.add_cookie_str("SOCS=CAESHAgBEhJnd3NfMjAyNDA5MDUtMF9SQzIaAmVuIAEaBgiA_L20Bg; Path=/; Domain=.google.com; Secure", &google_url);
-            cookie_jar.add_cookie_str("CONSENT=PENDING+987; Path=/; Domain=.google.com; Secure", &google_url);
-            cookie_jar.add_cookie_str("AEC=AZ6Zc-Wz2R61_67w88hJ; Path=/; Domain=.google.com; Secure", &google_url);
+            cookie_jar.add_cookie_str(
+                "CONSENT=PENDING+987; Path=/; Domain=.google.com; Secure",
+                &google_url,
+            );
+            cookie_jar.add_cookie_str(
+                "AEC=AZ6Zc-Wz2R61_67w88hJ; Path=/; Domain=.google.com; Secure",
+                &google_url,
+            );
         }
         if let Ok(ddg_url) = "https://duckduckgo.com".parse::<reqwest::Url>() {
             cookie_jar.add_cookie_str("5=0; Path=/; Domain=.duckduckgo.com; Secure", &ddg_url);
@@ -93,7 +99,9 @@ impl NetworkClient {
 
     pub async fn fetch(&self, url: &str) -> Result<FetchResult> {
         if url.starts_with("file://") {
-            let file_path = url.trim_start_matches("file:///").trim_start_matches("file://");
+            let file_path = url
+                .trim_start_matches("file:///")
+                .trim_start_matches("file://");
             let clean_path = file_path.replace('/', "\\");
             let html = std::fs::read_to_string(&clean_path)
                 .or_else(|_| std::fs::read_to_string(file_path))
