@@ -25,3 +25,6 @@ rustup-init.exe
 *.png
 *.jsonl
 __pycache__/
+
+# Secrets - never commit
+.env
