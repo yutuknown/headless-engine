@@ -1,1 +1,0 @@
-If you're having trouble accessing Google Search, please [click here](https://www.google.com/search?q=what+is+artificial+intelligence+agent&sca_esv=5dcec58ab3c3b762&emsg=SG_REL&sei=9buEaoi6G7ybseMPx5CK6QI), or send [feedback](https://support.google.com/websearch).

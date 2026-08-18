@@ -1,1 +1,0 @@
-If you're having trouble accessing Google Search, please [click here](https://www.google.com/search?q=james+webb+space+telescope+deep+field&sca_esv=5dcec58ab3c3b762&udm=2&emsg=SG_REL&sei=9LuEaoK7O--VseMPxIew8Aw), or send [feedback](https://support.google.com/websearch).

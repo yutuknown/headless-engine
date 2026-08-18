@@ -37,8 +37,7 @@ package-lock.json
 package.json
 scratch/
 test_npm/
-test_sdk.py
-test_google_ecosystem.py
-evidence/*.html
+evidence/
+
 
 
