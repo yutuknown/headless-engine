@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-REPO="maintainers/headless-engine"
+REPO="yutuknown/headless-engine"
 INSTALL_DIR="/usr/local/bin"
 
 echo ">>> Detecting OS and Architecture..."
@@ -15,7 +15,11 @@ if [ "$OS" = "darwin" ]; then
         ASSET="headless-engine-macos-x86_64.tar.gz"
     fi
 elif [ "$OS" = "linux" ]; then
-    ASSET="headless-engine-linux-x86_64.tar.gz"
+    if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+        ASSET="headless-engine-linux-arm64.tar.gz"
+    else
+        ASSET="headless-engine-linux-x86_64.tar.gz"
+    fi
 else
     echo "Unsupported OS: $OS"
     exit 1

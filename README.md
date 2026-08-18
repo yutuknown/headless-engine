@@ -62,14 +62,14 @@ browser.close();
 
 ### 4. 🐹 Go Module (`go get`)
 ```bash
-go get github.com/maintainers/headless-engine/sdk/go
+go get github.com/yutuknown/headless-engine/sdk/go
 ```
 ```go
 package main
 
 import (
     "fmt"
-    "github.com/maintainers/headless-engine/sdk/go"
+    "github.com/yutuknown/headless-engine/sdk/go"
 )
 
 func main() {
@@ -85,17 +85,17 @@ func main() {
 
 ### 5. 🐳 Docker Container (<20MB Image)
 ```bash
-docker run -d --name headless-engine -p 9222:9222 ghcr.io/maintainers/headless-engine:latest
+docker run -d --name headless-engine -p 9222:9222 ghcr.io/yutuknown/headless-engine:latest
 ```
 
 ### 6. ⚡ 1-Line Standalone Binary Installer
 - **Linux & macOS:**
   ```bash
-  curl -fsSL https://raw.githubusercontent.com/maintainers/headless-engine/main/install.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/yutuknown/headless-engine/master/install.sh | bash
   ```
 - **Windows PowerShell:**
   ```powershell
-  iwr -useb https://raw.githubusercontent.com/maintainers/headless-engine/main/install.ps1 | iex
+  iwr -useb https://raw.githubusercontent.com/yutuknown/headless-engine/master/install.ps1 | iex
   ```
 
 ---

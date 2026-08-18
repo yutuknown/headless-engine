@@ -1,7 +1,7 @@
 # Headless Engine Windows Installer
 $ErrorActionPreference = "Stop"
 
-$repo = "maintainers/headless-engine"
+$repo = "yutuknown/headless-engine"
 $asset = "headless-engine-windows-x86_64.zip"
 $installDir = "$env:LOCALAPPDATA\Programs\headless-engine"
 
