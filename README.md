@@ -1,7 +1,5 @@
 <div align="center">
-  <img src="logo.svg" alt="Headless Engine Logo" width="500" height="120">
-
-# Headless Engine
+  <img src="logo.svg" alt="Headless Engine Logo" width="400" height="300">
 
 > **Ultra-lightweight (<30MB RAM), detection-free pure-Rust headless browser engine built specifically for AI agents, web scraping, and Go-based MCP servers.**
 
