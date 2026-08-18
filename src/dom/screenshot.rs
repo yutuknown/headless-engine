@@ -4,7 +4,7 @@ use anyhow::Result;
 use base64::Engine;
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use std::sync::atomic::{AtomicUsize, Ordering};
 
@@ -40,19 +40,19 @@ impl RealBrowserScreenshot {
                 r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
             ];
             for path_str in &candidates {
-                let p = Path::new(path_str);
+                let p = std::path::Path::new(path_str);
                 if p.exists() {
                     return Some(p.to_path_buf());
                 }
             }
             if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
                 let chrome_local =
-                    Path::new(&local_app_data).join(r"Google\Chrome\Application\chrome.exe");
+                    std::path::Path::new(&local_app_data).join(r"Google\Chrome\Application\chrome.exe");
                 if chrome_local.exists() {
                     return Some(chrome_local);
                 }
                 let edge_local =
-                    Path::new(&local_app_data).join(r"Microsoft\Edge\Application\msedge.exe");
+                    std::path::Path::new(&local_app_data).join(r"Microsoft\Edge\Application\msedge.exe");
                 if edge_local.exists() {
                     return Some(edge_local);
                 }
@@ -94,7 +94,7 @@ impl RealBrowserScreenshot {
                 "/Applications/Chromium.app/Contents/MacOS/Chromium",
             ];
             for path_str in &candidates {
-                let p = Path::new(path_str);
+                let p = std::path::Path::new(path_str);
                 if p.exists() {
                     return Some(p.to_path_buf());
                 }
@@ -122,7 +122,7 @@ impl RealBrowserScreenshot {
                 "chromium-browser",
             ];
             for bin in &candidates {
-                if let Ok(output) = Command::new("which").arg(bin).output() {
+                if let Ok(output) = std::process::Command::new("which").arg(bin).output() {
                     if output.status.success() {
                         let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
                         if !path_str.is_empty() {
