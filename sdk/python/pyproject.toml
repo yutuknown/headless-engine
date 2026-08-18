@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "headless-engine"
 version = "1.0.0"
 description = "Ultra-lightweight (<30MB RAM), detection-free headless browser engine for AI agents, web scraping, and MCP servers."
-readme = "README.md"
+readme = { file = "README.md", content-type = "text/markdown" }
 authors = [{ name = "Headless Engine Contributors", email = "maintainers@headless-engine.dev" }]
 license = { text = "MIT OR Apache-2.0" }
 classifiers = [
