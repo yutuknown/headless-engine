@@ -1,4 +1,8 @@
-# 🚀 Antigravity Headless Engine (v1.0.0)
+<div align="center">
+  <img src="logo.jpg" alt="Headless Engine Logo" width="200" height="200">
+</div>
+
+# Headless Engine (v1.0.0)
 
 > **Ultra-lightweight (<30MB RAM), detection-free pure-Rust headless browser engine built specifically for AI agents, web scraping, and Go-based MCP servers.**
 
@@ -7,11 +11,11 @@
 [![Memory Footprint](https://img.shields.io/badge/RAM-~18MB-brightgreen.svg)]()
 [![Multi-Ecosystem](https://img.shields.io/badge/SDKs-Rust%20%7C%20Python%20%7C%20Node.js%20%7C%20Go%20%7C%20Docker-blueviolet.svg)]()
 
-Unlike traditional headless browsers (Puppeteer, Playwright, Selenium) that spawn resource-heavy Chromium processes consuming 300MB–800MB of RAM per instance, **Antigravity Headless Engine** is written entirely in pure Rust. It operates with an astonishing **<30MB RAM footprint**, allowing you to run 20+ concurrent browser sessions seamlessly on a single 512MB RAM server.
+Unlike traditional headless browsers (Puppeteer, Playwright, Selenium) that spawn resource-heavy Chromium processes consuming 300MB–800MB of RAM per instance, **Headless Engine** is written entirely in pure Rust. It operates with an astonishing **<30MB RAM footprint**, allowing you to run 20+ concurrent browser sessions seamlessly on a single 512MB RAM server.
 
 ---
 
-## ⚡ Key Highlights
+## Key Highlights
 
 - 🪶 **Ultra-Lightweight (<30MB RAM):** Zero GPU overhead, zero compositor, zero native V8 instantiation. Pure data extraction and structural analysis using Rust's `scraper` and isolated `boa_engine` runtimes.
 - 🛡️ **Zero-Detection WAF Bypass:** Employs a revolutionary **Offline Rendering Engine**. The raw HTML payload is fetched via an impersonated pure-Rust HTTP/2 client. A local `<base href="target">` is injected, and Chromium renders `file:///...html`. Because Chromium *never negotiates TLS with the target server*, **Cloudflare and Datadome traps are bypassed completely.**
@@ -23,7 +27,7 @@ Unlike traditional headless browsers (Puppeteer, Playwright, Selenium) that spaw
 
 ---
 
-## 📦 Universal Installation & Dependency Setup
+## Universal Installation & Dependency Setup
 
 ### 1. 🦀 Rust Crate
 ```bash
@@ -97,11 +101,11 @@ docker run -d --name headless-engine -p 9222:9222 ghcr.io/maintainers/headless-e
 
 ---
 
-## 📊 Benchmark Comparison: Antigravity vs. Lightpanda
+## Benchmark Comparison: Headless Engine vs. Lightpanda
 
-We built Antigravity after observing the architectural friction and lack of native cross-platform support in Zig-based alternatives like Lightpanda. Here is how we stack up:
+We built Headless Engine after observing the architectural friction and lack of native cross-platform support in Zig-based alternatives like Lightpanda. Here is how we stack up:
 
-| Feature | Headless Chrome (Playwright) | Lightpanda (Zig) | **Antigravity Engine (Rust)** |
+| Feature | Headless Chrome (Playwright) | Lightpanda (Zig) | **Headless Engine (Rust)** |
 | :--- | :--- | :--- | :--- |
 | **Memory Footprint** | ~350 MB – 800 MB | ~50 MB | **< 20 MB** |
 | **Native Windows Support** | ✅ Yes | ❌ No (Requires WSL2) | **✅ Native `.exe` + Linux + macOS** |

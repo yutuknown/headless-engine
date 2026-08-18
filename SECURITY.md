@@ -12,7 +12,7 @@
 If you discover a security vulnerability or anti-detection bypass issue in Headless Engine:
 
 1. **Do not create a public GitHub issue.**
-2. Please report the issue via GitHub's Private Vulnerability Reporting or email the maintainers at `security@antigravity.dev`.
+2. Please report the issue via GitHub's Private Vulnerability Reporting or email the maintainers at `security@headless-engine.dev`.
 3. Please include:
    - Target URL or site demonstrating the issue.
    - Steps to reproduce.
