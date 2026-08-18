@@ -52,7 +52,7 @@ jobs:
 
       - name: Publish to PyPI
         working-directory: sdk/python
-        run: twine upload dist/* --username __token__ --password ${{ secrets.PYPI_API_TOKEN }}
+        run: twine upload dist/* --username __token__ --password ${{ secrets.PYPI_API_TOKEN }} --skip-existing
 
   # ─────────────────────────────────────────
   # 3. Publish Node.js package to npmjs.com
