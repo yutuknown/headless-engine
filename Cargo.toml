@@ -1,11 +1,14 @@
 [package]
 name = "headless-engine"
-version = "1.0.1"
+version = "1.0.2"
 edition = "2021"
 authors = ["Headless Engine Contributors <maintainers@headless-engine.dev>"]
-description = "Ultra-lightweight (<30MB RAM), detection-free pure-Rust headless browser engine for AI agents, web scraping, and MCP servers."
+description = "A high-performance, lightweight (<30MB RAM) headless browser engine written in Rust for AI agents, web automation, and LLM data ingestion."
 license = "MIT OR Apache-2.0"
 readme = "README.md"
+repository = "https://github.com/yutuknown/headless-engine"
+homepage = "https://github.com/yutuknown/headless-engine"
+documentation = "https://docs.rs/headless-engine"
 keywords = ["headless-browser", "ai-agent", "mcp", "scraping", "stealth"]
 categories = ["web-programming", "command-line-utilities", "development-tools"]
 

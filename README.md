@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/logo.svg" alt="Headless Engine Logo" width="460">
+  <img src="https://raw.githubusercontent.com/yutuknown/headless-engine/master/assets/logo.svg" alt="Headless Engine Logo" width="460">
   <br><br>
 
   <p><strong>A high-performance, lightweight (&lt;30MB RAM) headless browser engine written in Rust for AI agents, web automation, and LLM data ingestion.</strong></p>
