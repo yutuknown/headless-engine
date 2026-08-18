@@ -54,7 +54,7 @@ struct Cli {
     #[arg(short, long)]
     json: bool,
 
-    /// Start interactive Claude Code-style REPL session
+    /// Start interactive REPL session
     #[arg(short, long)]
     interactive: bool,
 }
@@ -62,7 +62,6 @@ struct Cli {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
-
     let profile = parse_profile(&cli.profile);
 
     // Mode 1: JSON-RPC 2.0 STDIO Mode for Go MCP servers and AI agents
@@ -184,7 +183,7 @@ async fn execute_target(
         return Ok(());
     }
 
-    // Claude Code-style UX rendering
+    // Claude Code-style modern minimalist UX
     let markdown = tab.extract_markdown(None).unwrap_or_default();
     let links = tab.extract_links();
     let forms = tab.extract_forms();
@@ -196,63 +195,59 @@ async fn execute_target(
     };
 
     let status_badge = if report.status >= 200 && report.status < 300 {
-        format!("\x1b[1;32m{} OK\x1b[0m", report.status)
+        format!("\x1b[32m{} OK\x1b[0m", report.status)
     } else {
-        format!("\x1b[1;33m{} Redirect/Warn\x1b[0m", report.status)
+        format!("\x1b[33m{}\x1b[0m", report.status)
     };
 
     let profile_name = format!("{:?}", profile).to_lowercase();
 
-    // Top Card
-    eprintln!("\x1b[38;5;240m╭─\x1b[0m \x1b[1m{}\x1b[0m \x1b[38;5;244m({})\x1b[0m", report.final_url, profile_name);
+    eprintln!();
     eprintln!(
-        "\x1b[38;5;240m│\x1b[0m  \x1b[38;5;39m●\x1b[0m \x1b[1mNetwork\x1b[0m    {} \x1b[38;5;240m·\x1b[0m \x1b[38;5;244m{:.2} KB\x1b[0m \x1b[38;5;240m·\x1b[0m \x1b[38;5;244m{:?}\x1b[0m",
-        status_badge,
-        report.html_bytes as f64 / 1024.0,
-        duration
+        "  \x1b[38;5;39m●\x1b[0m \x1b[1m{}\x1b[0m \x1b[38;5;244m({})\x1b[0m",
+        report.final_url, profile_name
     );
     eprintln!(
-        "\x1b[38;5;240m│\x1b[0m  \x1b[38;5;39m●\x1b[0m \x1b[1mDOM Engine\x1b[0m \x1b[38;5;244m{} actionable links\x1b[0m \x1b[38;5;240m·\x1b[0m \x1b[38;5;244m{} interactive forms\x1b[0m",
+        "    \x1b[38;5;244m├─ Network:\x1b[0m    {} \x1b[38;5;240m·\x1b[0m \x1b[38;5;248m{:.1} KB\x1b[0m \x1b[38;5;240m·\x1b[0m \x1b[38;5;248m{:.1}ms\x1b[0m",
+        status_badge,
+        report.html_bytes as f64 / 1024.0,
+        duration.as_secs_f64() * 1000.0
+    );
+    eprintln!(
+        "    \x1b[38;5;244m├─ DOM Engine:\x1b[0m \x1b[38;5;248m{} actionable links\x1b[0m \x1b[38;5;240m·\x1b[0m \x1b[38;5;248m{} forms\x1b[0m",
         links.len(),
         forms.len()
     );
     eprintln!(
-        "\x1b[38;5;240m│\x1b[0m  \x1b[38;5;39m●\x1b[0m \x1b[1mMarkdown\x1b[0m   \x1b[38;5;244m{} bytes\x1b[0m \x1b[38;5;240m·\x1b[0m \x1b[1;32m{:.1}% token compression\x1b[0m",
+        "    \x1b[38;5;244m├─ Markdown:\x1b[0m   \x1b[38;5;248m{} bytes\x1b[0m \x1b[38;5;240m·\x1b[0m \x1b[32m{:.1}% token compression\x1b[0m",
         markdown.len(),
         compression.max(0.0)
     );
     if !report.page_title.is_empty() {
-        eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[38;5;39m●\x1b[0m \x1b[1mTitle\x1b[0m      \x1b[38;5;250m{}\x1b[0m", report.page_title);
+        eprintln!(
+            "    \x1b[38;5;244m└─ Title:\x1b[0m      \x1b[38;5;252m{}\x1b[0m",
+            report.page_title
+        );
     }
-    eprintln!("\x1b[38;5;240m╰─\x1b[0m \x1b[38;5;244mCompleted in {:?}\x1b[0m\n", duration);
+    eprintln!();
 
-    // Markdown Preview Box with safe terminal margin
-    print_markdown_preview(&markdown, 10);
+    // Markdown preview
+    let lines: Vec<&str> = markdown.lines().filter(|l| !l.trim().is_empty()).collect();
+    if !lines.is_empty() {
+        eprintln!("  \x1b[1;38;5;244mPreview (LLM Markdown):\x1b[0m");
+        for line in lines.into_iter().take(6) {
+            let trimmed = line.trim();
+            let preview = if trimmed.len() > 76 {
+                format!("{}...", &trimmed[..73])
+            } else {
+                trimmed.to_string()
+            };
+            eprintln!("    \x1b[38;5;250m{}\x1b[0m", preview);
+        }
+        eprintln!("    \x1b[38;5;240m(use -m to dump full payload)\x1b[0m\n");
+    }
 
     Ok(())
-}
-
-fn print_markdown_preview(markdown: &str, max_lines: usize) {
-    let lines: Vec<&str> = markdown.lines().filter(|l| !l.trim().is_empty()).collect();
-    if lines.is_empty() {
-        return;
-    }
-
-    eprintln!("\x1b[38;5;240m╭─\x1b[0m \x1b[1mLLM Markdown Content\x1b[0m \x1b[38;5;244m(preview)\x1b[0m");
-
-    let max_len = 58; // Conservative width to guarantee zero line-wrap on split panes
-    for line in lines.into_iter().take(max_lines) {
-        let trimmed = line.trim();
-        let chars: Vec<char> = trimmed.chars().collect();
-        if chars.len() > max_len {
-            let chunk: String = chars.into_iter().take(max_len - 3).collect();
-            eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[38;5;252m{}...\x1b[0m", chunk);
-        } else {
-            eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[38;5;252m{}\x1b[0m", trimmed);
-        }
-    }
-
-    eprintln!("\x1b[38;5;240m╰─\x1b[0m \x1b[38;5;244mRun with -m / --markdown to dump complete payload\x1b[0m\n");
 }
 
 async fn run_interactive_repl(
@@ -260,16 +255,17 @@ async fn run_interactive_repl(
     proxy: Option<String>,
     timeout_secs: u64,
 ) -> anyhow::Result<()> {
-    eprintln!("\x1b[38;5;240m╭─\x1b[0m \x1b[1;38;5;39mheadless-engine\x1b[0m \x1b[38;5;244mv1.0.0\x1b[0m");
-    eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[38;5;248mPure-Rust Headless Browser Engine for AI Agents & Scraping\x1b[0m");
-    eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[38;5;244mType a URL, search query, or /help for commands\x1b[0m");
-    eprintln!("\x1b[38;5;240m╰────────────────────────────────────────────────────────────\x1b[0m\n");
+    eprintln!();
+    eprintln!("  \x1b[1;38;5;39mheadless-engine\x1b[0m \x1b[38;5;244mv1.0.0\x1b[0m");
+    eprintln!("  \x1b[38;5;248mPure-Rust Headless Browser Engine for AI Agents & Web Scraping\x1b[0m");
+    eprintln!("  \x1b[38;5;244mType a URL, search query, or /help. Type /exit to quit.\x1b[0m");
+    eprintln!();
 
     let stdin = io::stdin();
     let mut reader = stdin.lock();
 
     loop {
-        eprint!("\x1b[1;38;5;39m❯\x1b[0m ");
+        eprint!("  \x1b[1;38;5;39m❯\x1b[0m ");
         io::stderr().flush()?;
 
         let mut line = String::new();
@@ -283,7 +279,7 @@ async fn run_interactive_repl(
         }
 
         if input == "exit" || input == "quit" || input == "/exit" || input == "/quit" || input == "q" {
-            eprintln!("\x1b[38;5;244mSession ended.\x1b[0m");
+            eprintln!("  \x1b[38;5;244mGoodbye.\x1b[0m\n");
             break;
         }
 
@@ -293,21 +289,22 @@ async fn run_interactive_repl(
         }
 
         if input == "/help" || input == "help" || input == "?" {
-            eprintln!("\x1b[38;5;240m╭─\x1b[0m \x1b[1mAvailable Commands\x1b[0m");
-            eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[1m<url>\x1b[0m                     Navigate and extract LLM Markdown & elements");
-            eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[1m/search <query>\x1b[0m           Perform search & extract SERP entities");
-            eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[1m/profile <name>\x1b[0m           Switch device [chrome-windows, safari-ios, android, mac]");
-            eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[1m/markdown <url>\x1b[0m           Dump complete raw Markdown to stdout");
-            eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[1m/clear\x1b[0m                    Clear terminal window");
-            eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[1m/exit\x1b[0m                     Quit interactive session");
-            eprintln!("\x1b[38;5;240m╰─────────────────────────────────────────────────────────────\x1b[0m\n");
+            eprintln!();
+            eprintln!("  \x1b[1mCommands:\x1b[0m");
+            eprintln!("    \x1b[38;5;39m<url>\x1b[0m               Navigate and extract page structure");
+            eprintln!("    \x1b[38;5;39m/search <query>\x1b[0m     Search and extract SERP entities");
+            eprintln!("    \x1b[38;5;39m/profile <name>\x1b[0m     Switch profile (chrome-windows, safari-ios, android)");
+            eprintln!("    \x1b[38;5;39m/markdown <url>\x1b[0m     Dump complete LLM markdown");
+            eprintln!("    \x1b[38;5;39m/clear\x1b[0m              Clear terminal screen");
+            eprintln!("    \x1b[38;5;39m/exit\x1b[0m               Exit REPL");
+            eprintln!();
             continue;
         }
 
         if input.starts_with("/profile ") {
             let p_str = input["/profile ".len()..].trim();
             current_profile = parse_profile(p_str);
-            eprintln!("\x1b[32m✓\x1b[0m Active profile set to: \x1b[1m{:?}\x1b[0m\n", current_profile);
+            eprintln!("  \x1b[32m✓\x1b[0m Active profile: \x1b[1m{:?}\x1b[0m\n", current_profile);
             continue;
         }
 
@@ -343,7 +340,7 @@ async fn run_interactive_repl(
         )
         .await
         {
-            eprintln!("\x1b[1;31m✗ Error:\x1b[0m {}\n", e);
+            eprintln!("  \x1b[31m✗ Error:\x1b[0m {}\n", e);
         }
     }
 
