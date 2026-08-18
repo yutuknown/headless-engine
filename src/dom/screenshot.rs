@@ -194,16 +194,28 @@ impl RealBrowserScreenshot {
         let screenshot_arg = format!("--screenshot={}", temp_png_str);
         let window_size_arg = format!("--window-size={},{}", width, height);
 
+        let target_arg = if url.starts_with("http://") || url.starts_with("https://") {
+            url.to_string()
+        } else {
+            temp_html_str
+        };
+
+        let profile_dir = std::env::temp_dir().join("headless_engine_stealth_profile");
+        let profile_arg = format!("--user-data-dir={}", profile_dir.to_string_lossy());
+
         let mut cmd = tokio::process::Command::new(&browser_bin);
         cmd.arg("--headless=new")
             .arg("--disable-gpu")
             .arg("--no-sandbox")
+            .arg(&profile_arg)
             .arg("--hide-scrollbars")
             .arg("--disable-blink-features=AutomationControlled")
+            .arg("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
+            .arg("--lang=en-US,en")
             .arg("--virtual-time-budget=8000")
             .arg(&window_size_arg)
             .arg(&screenshot_arg)
-            .arg(&temp_html_str);
+            .arg(&target_arg);
 
         #[cfg(target_os = "windows")]
         cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
@@ -276,16 +288,28 @@ impl RealBrowserScreenshot {
         let screenshot_arg = format!("--screenshot={}", temp_png_str);
         let window_size_arg = format!("--window-size={},{}", width, height);
 
+        let target_arg = if url.starts_with("http://") || url.starts_with("https://") {
+            url.to_string()
+        } else {
+            temp_html_str
+        };
+
+        let profile_dir = std::env::temp_dir().join("headless_engine_stealth_profile");
+        let profile_arg = format!("--user-data-dir={}", profile_dir.to_string_lossy());
+
         let mut cmd = std::process::Command::new(&browser_bin);
         cmd.arg("--headless=new")
             .arg("--disable-gpu")
             .arg("--no-sandbox")
+            .arg(&profile_arg)
             .arg("--hide-scrollbars")
             .arg("--disable-blink-features=AutomationControlled")
+            .arg("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
+            .arg("--lang=en-US,en")
             .arg("--virtual-time-budget=8000")
             .arg(&window_size_arg)
             .arg(&screenshot_arg)
-            .arg(&temp_html_str);
+            .arg(&target_arg);
 
         #[cfg(target_os = "windows")]
         {

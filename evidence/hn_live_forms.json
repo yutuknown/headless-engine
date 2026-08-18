@@ -1,0 +1,14 @@
+[
+  {
+    "action": "//hn.algolia.com/",
+    "inputs": [
+      {
+        "input_type": "text",
+        "name": "q",
+        "placeholder": "",
+        "value": ""
+      }
+    ],
+    "method": "GET"
+  }
+]

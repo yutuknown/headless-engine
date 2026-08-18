@@ -118,6 +118,23 @@ impl JsonRpcHandler {
                     Err(e) => RpcResponse::error(id, -32000, format!("Navigation failed: {}", e)),
                 }
             }
+            "tab.setContent" | "tab.setHtml" | "setContent" | "setHtml" => {
+                let html = params.get("html").and_then(|v| v.as_str()).unwrap_or("");
+                let url = params.get("url").and_then(|v| v.as_str());
+                let tab = match self.get_target_tab_mut(params) {
+                    Ok(t) => t,
+                    Err(e) => return RpcResponse::error(id, -32000, e.to_string()),
+                };
+                match tab.set_content(html, url) {
+                    Ok(report) => match serde_json::to_value(report) {
+                        Ok(v) => RpcResponse::success(id, v),
+                        Err(e) => {
+                            RpcResponse::error(id, -32000, format!("Serialization failed: {}", e))
+                        }
+                    },
+                    Err(e) => RpcResponse::error(id, -32000, format!("SetContent failed: {}", e)),
+                }
+            }
             "tab.observe" | "observe" | "Observe" => {
                 let tab = match self.get_target_tab_mut(params) {
                     Ok(t) => t,

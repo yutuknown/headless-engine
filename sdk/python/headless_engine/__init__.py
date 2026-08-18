@@ -185,6 +185,19 @@ class HeadlessBrowser:
             params["tab_id"] = tab_id
         return self._call("tab.navigate", params)
 
+    def set_content(self, html: str, url: Optional[str] = None, tab_id: Optional[str] = None) -> Dict[str, Any]:
+        """Sets HTML content directly on the active tab for offline parsing."""
+        params: Dict[str, Any] = {"html": html}
+        if url:
+            params["url"] = url
+        if tab_id:
+            params["tab_id"] = tab_id
+        return self._call("tab.setContent", params)
+
+    def set_html(self, html: str, url: Optional[str] = None, tab_id: Optional[str] = None) -> Dict[str, Any]:
+        """Alias for set_content."""
+        return self.set_content(html, url, tab_id)
+
     def observe(self, tab_id: Optional[str] = None) -> Dict[str, Any]:
         """Returns the full agent observation (indexed action tree, page title, URL, and summary)."""
         params: Dict[str, Any] = {}

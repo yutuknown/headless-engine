@@ -7,16 +7,31 @@ impl HtmlToMarkdown {
     pub fn convert(html_str: &str, base_url: Option<&str>) -> String {
         let document = Html::parse_document(html_str);
 
-        // Try extracting main content container if available to eliminate boilerplate
-        let content_selector = Selector::parse(
-            "article, main, div[role='main'], div.main-content, div.post-content, div#content, body",
-        )
-        .ok();
+        // Try extracting high-signal main content container first
+        let content_candidates = [
+            "#search",
+            "#rso",
+            "#rcnt",
+            "#mw-content-text",
+            "article",
+            "main",
+            "div[role='main']",
+            "div.main-content",
+            "div.post-content",
+            "div.article-body",
+            "div#content",
+            "body",
+        ];
 
-        let root_element = content_selector
-            .as_ref()
-            .and_then(|sel| document.select(sel).next())
-            .unwrap_or_else(|| document.root_element());
+        let mut root_element = document.root_element();
+        for candidate in content_candidates {
+            if let Ok(sel) = Selector::parse(candidate) {
+                if let Some(el) = document.select(&sel).next() {
+                    root_element = el;
+                    break;
+                }
+            }
+        }
 
         let mut output = String::new();
         Self::walk_node(&root_element, &mut output, base_url);
@@ -33,11 +48,48 @@ impl HtmlToMarkdown {
     fn walk_node(element: &ElementRef, output: &mut String, base_url: Option<&str>) {
         let tag_name = element.value().name();
 
-        // Skip non-content / hidden tags
+        // 1. Skip non-content / hidden tags
         match tag_name {
             "script" | "style" | "noscript" | "svg" | "canvas" | "iframe" | "header" | "footer"
-            | "nav" | "dialog" => return,
+            | "nav" | "dialog" | "aside" => return,
             _ => {}
+        }
+
+        // 2. Skip hidden and accessibility boilerplate elements
+        if element.value().attr("aria-hidden") == Some("true")
+            || element.value().attr("hidden").is_some()
+        {
+            return;
+        }
+
+        if let Some(role) = element.value().attr("role") {
+            if role == "navigation" || role == "banner" || role == "contentinfo" || role == "search"
+            {
+                return;
+            }
+        }
+
+        if let Some(id) = element.value().attr("id") {
+            if id == "searchform"
+                || id == "fbar"
+                || id == "appbar"
+                || id == "footcnt"
+                || id == "before-appbar"
+                || id == "gb"
+            {
+                return;
+            }
+        }
+
+        if let Some(class) = element.value().attr("class") {
+            if class.contains("appbar")
+                || class.contains("fbar")
+                || class.contains("minidiv")
+                || class.contains("action-menu")
+                || class.contains("cookie-banner")
+            {
+                return;
+            }
         }
 
         match tag_name {
@@ -47,7 +99,7 @@ impl HtmlToMarkdown {
             "h4" => output.push_str("\n\n#### "),
             "h5" => output.push_str("\n\n##### "),
             "h6" => output.push_str("\n\n###### "),
-            "p" => output.push_str("\n\n"),
+            "p" | "section" | "article" => output.push_str("\n\n"),
             "br" => output.push('\n'),
             "hr" => output.push_str("\n\n---\n\n"),
             "blockquote" => output.push_str("\n\n> "),

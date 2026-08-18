@@ -28,3 +28,17 @@ __pycache__/
 
 # Secrets - never commit
 .env
+
+# Python venv & test workspaces
+.venv/
+venv/
+node_modules/
+package-lock.json
+package.json
+scratch/
+test_npm/
+test_sdk.py
+test_google_ecosystem.py
+evidence/*.html
+
+

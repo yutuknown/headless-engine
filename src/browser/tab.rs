@@ -82,6 +82,28 @@ impl BrowserTab {
         })
     }
 
+    pub fn set_content(&mut self, html: &str, url: Option<&str>) -> Result<NavigationReport> {
+        let dom = DomTree::parse(html)?;
+        let search_results = dom.parse_google_search_results();
+        let page_title = search_results.page_title.clone();
+        let final_url = url.unwrap_or("about:blank").to_string();
+        let html_bytes = html.len();
+
+        let _ = self.js.update_page_state(&final_url, &page_title);
+
+        self.dom = Some(dom);
+        self.current_url = Some(final_url.clone());
+
+        Ok(NavigationReport {
+            status: 200,
+            requested_url: final_url.clone(),
+            final_url,
+            page_title,
+            is_captcha_detected: search_results.is_captcha_detected,
+            html_bytes,
+        })
+    }
+
     pub fn observe(&self) -> Option<PageObservation> {
         let dom = self.dom.as_ref()?;
         let url = self.current_url.clone().unwrap_or_default();

@@ -62,6 +62,17 @@ impl NetworkClient {
             builder = builder.proxy(proxy);
         }
 
+        // StealthGuard: Pre-warm legitimate session and consent cookies
+        if let Ok(google_url) = "https://www.google.com".parse::<reqwest::Url>() {
+            cookie_jar.add_cookie_str("SOCS=CAESHAgBEhJnd3NfMjAyNDA5MDUtMF9SQzIaAmVuIAEaBgiA_L20Bg; Path=/; Domain=.google.com; Secure", &google_url);
+            cookie_jar.add_cookie_str("CONSENT=PENDING+987; Path=/; Domain=.google.com; Secure", &google_url);
+            cookie_jar.add_cookie_str("AEC=AZ6Zc-Wz2R61_67w88hJ; Path=/; Domain=.google.com; Secure", &google_url);
+        }
+        if let Ok(ddg_url) = "https://duckduckgo.com".parse::<reqwest::Url>() {
+            cookie_jar.add_cookie_str("5=0; Path=/; Domain=.duckduckgo.com; Secure", &ddg_url);
+            cookie_jar.add_cookie_str("l=en-us; Path=/; Domain=.duckduckgo.com; Secure", &ddg_url);
+        }
+
         let client = builder.build().context("Failed to build HTTP client")?;
 
         Ok(Self {
@@ -81,6 +92,20 @@ impl NetworkClient {
     }
 
     pub async fn fetch(&self, url: &str) -> Result<FetchResult> {
+        if url.starts_with("file://") {
+            let file_path = url.trim_start_matches("file:///").trim_start_matches("file://");
+            let clean_path = file_path.replace('/', "\\");
+            let html = std::fs::read_to_string(&clean_path)
+                .or_else(|_| std::fs::read_to_string(file_path))
+                .context(format!("Failed to read local file: {}", url))?;
+            return Ok(FetchResult {
+                status: 200,
+                final_url: url.to_string(),
+                html,
+                is_captcha_detected: false,
+            });
+        }
+
         let response = self
             .client
             .get(url)
@@ -90,35 +115,10 @@ impl NetworkClient {
 
         let status = response.status().as_u16();
         let final_url = response.url().to_string();
-        let mut html = response
+        let html = response
             .text()
             .await
             .context("Failed to decode response body")?;
-
-        // If Google serves the SGS dynamic challenge on search queries, extract live results seamlessly
-        if url.contains("google.com/search")
-            && html.contains("Google Search")
-            && html.len() < 100000
-            && !html.contains("<h3")
-        {
-            if let Some(q_idx) = url.find("q=") {
-                let after_q = &url[q_idx + 2..];
-                let end_idx = after_q.find('&').unwrap_or(after_q.len());
-                let query = &after_q[..end_idx];
-
-                let news_url = format!(
-                    "https://news.google.com/rss/search?q={}&hl=en-US&gl=US&ceid=US:en",
-                    query
-                );
-                if let Ok(news_resp) = self.client.get(&news_url).send().await {
-                    if let Ok(news_body) = news_resp.text().await {
-                        if news_body.contains("<item>") {
-                            html = news_body;
-                        }
-                    }
-                }
-            }
-        }
 
         let is_captcha_detected = html.contains("sorry/index?continue=")
             || html.contains("Our systems have detected unusual traffic")
