@@ -1,7 +1,10 @@
 # Multi-stage ultra-lightweight build (<20MB final image)
-FROM rust:1.82-alpine AS builder
+# Use latest stable Rust to ensure edition2024 dependency support
+FROM rust:latest AS builder
 
-RUN apk add --no-cache musl-dev
+RUN apt-get update && apt-get install -y musl-tools && rm -rf /var/lib/apt/lists/*
+
+RUN rustup target add x86_64-unknown-linux-musl
 
 WORKDIR /app
 COPY Cargo.toml ./
