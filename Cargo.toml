@@ -1,6 +1,6 @@
 [package]
 name = "headless-engine"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 authors = ["Headless Engine Contributors <maintainers@headless-engine.dev>"]
 description = "Ultra-lightweight (<30MB RAM), detection-free pure-Rust headless browser engine for AI agents, web scraping, and MCP servers."

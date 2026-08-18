@@ -1,6 +1,6 @@
 {
   "name": "headless-engine",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ultra-lightweight (<30MB RAM), detection-free headless browser engine for AI agents, web scraping, and MCP servers.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
