@@ -226,22 +226,33 @@ async fn execute_target(
     }
     eprintln!("\x1b[38;5;240m╰─\x1b[0m \x1b[38;5;244mCompleted in {:?}\x1b[0m\n", duration);
 
-    // Markdown Preview Box
-    let preview_lines: Vec<&str> = markdown.lines().filter(|l| !l.trim().is_empty()).take(12).collect();
-    if !preview_lines.is_empty() {
-        eprintln!("\x1b[38;5;240m╭─\x1b[0m \x1b[1mLLM Markdown Content\x1b[0m \x1b[38;5;244m(first {} lines)\x1b[0m", preview_lines.len());
-        for line in preview_lines {
-            let truncated = if line.len() > 100 {
-                format!("{}...", &line[..97])
-            } else {
-                line.to_string()
-            };
-            eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[38;5;252m{}\x1b[0m", truncated);
-        }
-        eprintln!("\x1b[38;5;240m╰─\x1b[0m \x1b[38;5;244mRun with -m / --markdown to dump complete payload\x1b[0m\n");
-    }
+    // Markdown Preview Box with safe terminal margin
+    print_markdown_preview(&markdown, 10);
 
     Ok(())
+}
+
+fn print_markdown_preview(markdown: &str, max_lines: usize) {
+    let lines: Vec<&str> = markdown.lines().filter(|l| !l.trim().is_empty()).collect();
+    if lines.is_empty() {
+        return;
+    }
+
+    eprintln!("\x1b[38;5;240m╭─\x1b[0m \x1b[1mLLM Markdown Content\x1b[0m \x1b[38;5;244m(preview)\x1b[0m");
+
+    let max_len = 58; // Conservative width to guarantee zero line-wrap on split panes
+    for line in lines.into_iter().take(max_lines) {
+        let trimmed = line.trim();
+        let chars: Vec<char> = trimmed.chars().collect();
+        if chars.len() > max_len {
+            let chunk: String = chars.into_iter().take(max_len - 3).collect();
+            eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[38;5;252m{}...\x1b[0m", chunk);
+        } else {
+            eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[38;5;252m{}\x1b[0m", trimmed);
+        }
+    }
+
+    eprintln!("\x1b[38;5;240m╰─\x1b[0m \x1b[38;5;244mRun with -m / --markdown to dump complete payload\x1b[0m\n");
 }
 
 async fn run_interactive_repl(
