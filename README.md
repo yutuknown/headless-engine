@@ -1,13 +1,17 @@
 <div align="center">
-  <img src="logo.svg" alt="Headless Engine Logo" width="400" height="300">
+  <img src="logo.svg" alt="Headless Engine Logo" width="460">
+  <br><br>
 
-> **A high-performance, lightweight (<30MB RAM) headless browser engine written in Rust for AI agents, web automation, and LLM data ingestion.**
+  <p><strong>A high-performance, lightweight (&lt;30MB RAM) headless browser engine written in Rust for AI agents, web automation, and LLM data ingestion.</strong></p>
 
-[![Rust](https://img.shields.io/badge/rust-stable-orange.svg)](https://www.rust-lang.org)
-[![crates.io](https://img.shields.io/crates/v/headless-engine.svg)](https://crates.io/crates/headless-engine)
-[![PyPI](https://img.shields.io/pypi/v/headless-engine.svg)](https://pypi.org/project/headless-engine/)
-[![npm](https://img.shields.io/npm/v/headless-engine.svg)](https://www.npmjs.com/package/headless-engine)
-[![License](https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue.svg)]()
+  <p>
+    <a href="https://www.rust-lang.org"><img src="https://img.shields.io/badge/rust-stable-orange.svg" alt="Rust"></a>
+    <a href="https://crates.io/crates/headless-engine"><img src="https://img.shields.io/crates/v/headless-engine.svg" alt="crates.io"></a>
+    <a href="https://pypi.org/project/headless-engine/"><img src="https://img.shields.io/pypi/v/headless-engine.svg" alt="PyPI"></a>
+    <a href="https://www.npmjs.com/package/headless-engine"><img src="https://img.shields.io/npm/v/headless-engine.svg" alt="npm"></a>
+    <img src="https://img.shields.io/badge/RAM-~9.4MB_idle-brightgreen.svg" alt="Memory">
+    <a href="LICENSE-MIT"><img src="https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue.svg" alt="License"></a>
+  </p>
 </div>
 
 Traditional headless browsers (such as Puppeteer or Playwright) orchestrate full multi-process Chromium instances that typically consume 350MB–800MB of RAM per instance with significant initialization overhead.
