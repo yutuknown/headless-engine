@@ -1,40 +1,58 @@
 <div align="center">
   <img src="logo.svg" alt="Headless Engine Logo" width="400" height="300">
 
-> **Ultra-lightweight (<30MB RAM), detection-free pure-Rust headless browser engine built specifically for AI agents, web scraping, and Go-based MCP servers.**
+> **A high-performance, lightweight (<30MB RAM) headless browser engine written in Rust for AI agents, web automation, and LLM data ingestion.**
 
 [![Rust](https://img.shields.io/badge/rust-stable-orange.svg)](https://www.rust-lang.org)
+[![crates.io](https://img.shields.io/crates/v/headless-engine.svg)](https://crates.io/crates/headless-engine)
+[![PyPI](https://img.shields.io/pypi/v/headless-engine.svg)](https://pypi.org/project/headless-engine/)
+[![npm](https://img.shields.io/npm/v/headless-engine.svg)](https://www.npmjs.com/package/headless-engine)
 [![License](https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue.svg)]()
-[![Memory Footprint](https://img.shields.io/badge/RAM-~18MB-brightgreen.svg)]()
-[![Multi-Ecosystem](https://img.shields.io/badge/SDKs-Rust%20%7C%20Python%20%7C%20Node.js%20%7C%20Go%20%7C%20Docker-blueviolet.svg)]()
 </div>
 
+Traditional headless browsers (such as Puppeteer or Playwright) orchestrate full multi-process Chromium instances that typically consume 350MB–800MB of RAM per instance with significant initialization overhead.
 
-Unlike traditional headless browsers (Puppeteer, Playwright, Selenium) that spawn resource-heavy Chromium processes consuming 300MB–800MB of RAM per instance, **Headless Engine** is written entirely in pure Rust. It operates with an astonishing **<30MB RAM footprint**, allowing you to run 20+ concurrent browser sessions seamlessly on a single 512MB RAM server.
-
----
-
-## Key Highlights
-
-- 🪶 **Ultra-Lightweight (<30MB RAM):** Zero GPU overhead, zero compositor, zero native V8 instantiation. Pure data extraction and structural analysis using Rust's `scraper` and isolated `boa_engine` runtimes.
-- 🛡️ **StealthGuard Tier-1 Anti-Detection:** Deep JS runtime spoofing (`navigator.webdriver = false`, complete `window.chrome` hierarchy, WebGL ANGLE RTX unmasked renderer, realistic `PluginArray`, Chrome 133 Client Hints, and pre-warmed consent cookies). Defeats Google anti-bot, Cloudflare, and Datadome traps with **0% detection failure**.
-- 🤖 **Google AI Mode & Generative Search (`udm=50`):** Built-in extraction for Google's new full-page AI Mode, live **AI Overviews (SGE)**, Oxford Languages Knowledge Cards, YouTube Video timestamps, and People Also Ask.
-- 📝 **Native LLM Markdown Distillation:** Strips search filters, accessibility menus, and boilerplate noise, outputting pristine, high-density Markdown (~85%–90% LLM token compression).
-- ⚡ **Offline DOM Injection & `file://` Scheme:** Ingest offline rendered DOMs or local HTML files into active browser tabs via `browser.set_content(html)` or `tab.navigate("file:///...")` for high-speed offline parsing.
-- 📱 **Multi-Device Fingerprint Rotator:** Seamlessly switch between Windows Chrome, Linux Chrome, macOS Safari, iOS Safari (iPhone 16), and Android Chrome (Pixel 8) with deep JS BOM profile spoofing.
-- 🔌 **Universal Multi-Language Support:** First-class SDKs for **Rust**, **Python**, **Node.js / TypeScript**, **Go**, and **Docker**.
-- 🗂️ **Multi-Tab Concurrency:** Built-in arena-allocated tab manager (`BrowserEngine`) for concurrent, isolated multi-tab scraping.
+**Headless Engine** is designed as a purpose-built alternative: a fast, pure-Rust headless browser runtime that operates with a **<30MB RSS footprint** and sub-5ms initialization. It parses DOM trees directly, applies client fingerprint emulation to avoid automated bot triggers, and converts pages into clean, token-efficient Markdown optimized for LLM context windows.
 
 ---
 
-## Universal Installation & Dependency Setup
+## Key Features
+
+- 🪶 **Low Memory Overhead:** Sub-10MB idle RSS and ~15–35MB under active browsing, enabling high-density concurrency on resource-constrained servers.
+- 🛡️ **Fingerprint Emulation & Anti-Detection:** Injects realistic client profiles (`navigator.webdriver = false`, full `window.chrome` hierarchy, WebGL ANGLE vendor/renderer masking, Client Hints, and session persistence).
+- 🤖 **Search & Knowledge Extraction:** Built-in extraction for Google AI Mode (`udm=50`), AI Overviews (SGE), Oxford Languages Knowledge Cards, YouTube video timestamps, and organic results.
+- 📝 **LLM-Ready Markdown Distillation:** Natively converts HTML DOM trees into clean Markdown by stripping navigation menus, ads, headers/footers, and boilerplate scripts (~85% token reduction).
+- ⚡ **Offline Ingestion & DOM Injection:** Ingest raw HTML strings or local files into active tabs via `browser.set_content(html)` or `file://` URIs for offline parsing and deterministic testing.
+- 📱 **Multi-Device Profiles:** Switch between Windows Chrome, Linux Chrome, macOS Safari, iOS Safari, and Android Chrome.
+- 🔌 **Universal Multi-Language Support:** First-class SDKs and bindings for **Rust**, **Python**, **Node.js / TypeScript**, **Go**, and **Docker**.
+- 🗂️ **Multi-Tab Isolation:** Built-in arena-allocated tab manager (`BrowserEngine`) for concurrent, isolated multi-tab automation.
+- 📡 **Standard JSON-RPC 2.0 Interface:** Connect over standard I/O for direct integration with AI agents and Model Context Protocol (MCP) servers.
+
+---
+
+## Installation & Quick Start
 
 ### 1. 🦀 Rust Crate
 ```bash
 cargo add headless-engine
 ```
+```rust
+use headless_engine::{BrowserTab, DeviceProfile};
 
-### 2. 🐍 Python Package (`pip`)
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    let mut tab = BrowserTab::with_profile(DeviceProfile::ChromeWindows)?;
+    let report = tab.navigate("https://news.ycombinator.com/").await?;
+    
+    println!("Title: {} (Status: {})", report.page_title, report.status);
+    let markdown = tab.extract_markdown(None).unwrap();
+    println!("Markdown:\n{}", markdown);
+    
+    Ok(())
+}
+```
+
+### 2. 🐍 Python SDK (`pip`)
 ```bash
 pip install headless-engine
 ```
@@ -42,18 +60,18 @@ pip install headless-engine
 from headless_engine import HeadlessBrowser
 
 with HeadlessBrowser() as browser:
-    # Live navigation with StealthGuard anti-detection
+    # Navigate with automated fingerprint emulation
     report = browser.navigate("https://www.google.com/search?q=quantum+computing&udm=50")
     
-    # Extract high-density LLM Markdown
+    # Extract token-efficient LLM Markdown
     markdown = browser.extract_markdown()
-    print("LLM Markdown:\n", markdown)
+    print("Markdown:\n", markdown)
     
-    # Extract structured search entities (AI Overview, PAA, Organic Results)
+    # Extract structured search entities (AI Overviews, PAA, Organic Results)
     results = browser.extract_results()
 ```
 
-### 3. 🟢 Node.js / TypeScript (`npm`)
+### 3. 🟢 Node.js / TypeScript SDK (`npm`)
 ```bash
 npm install headless-engine
 ```
@@ -67,7 +85,7 @@ console.log('Markdown:', markdown);
 browser.close();
 ```
 
-### 4. 🐹 Go Module (`go get`)
+### 4. 🐹 Go Module
 ```bash
 go get github.com/yutuknown/headless-engine/sdk/go
 ```
@@ -85,17 +103,16 @@ func main() {
 
     report, _ := client.Navigate("https://en.wikipedia.org/wiki/Quantum_computing")
     markdown, _ := client.ExtractMarkdown("")
-    fmt.Println("Page Title:", report.PageTitle)
-    fmt.Println("Markdown Length:", len(markdown))
+    fmt.Printf("Page Title: %s\nContent Length: %d\n", report.PageTitle, len(markdown))
 }
 ```
 
-### 5. 🐳 Docker Container (<20MB Image)
+### 5. 🐳 Docker Container
 ```bash
 docker run -d --name headless-engine -p 9222:9222 ghcr.io/yutuknown/headless-engine:latest
 ```
 
-### 6. ⚡ 1-Line Standalone Binary Installer
+### 6. ⚡ Standalone Binary Installers
 - **Linux & macOS:**
   ```bash
   curl -fsSL https://raw.githubusercontent.com/yutuknown/headless-engine/master/install.sh | bash
@@ -107,77 +124,24 @@ docker run -d --name headless-engine -p 9222:9222 ghcr.io/yutuknown/headless-eng
 
 ---
 
-## Benchmark Comparison: Headless Engine vs. Lightpanda
+## Architectural Comparison
 
-We built Headless Engine after observing the architectural friction and lack of native cross-platform support in Zig-based alternatives like Lightpanda. Here is how we stack up:
-
-| Feature | Headless Chrome (Playwright) | Lightpanda (Zig) | **Headless Engine (Rust)** |
+| Metric / Capability | Chromium (Playwright/Puppeteer) | Lightpanda (Zig) | **Headless Engine (Rust)** |
 | :--- | :--- | :--- | :--- |
-| **Memory Footprint** | ~350 MB – 800 MB | ~50 MB | **< 20 MB** |
-| **Native Windows Support** | ✅ Yes | ❌ No (Requires WSL2) | **✅ Native `.exe` + Linux + macOS** |
-| **Dependencies** | Chromium C++ (Huge) | Zig / Libcurl / V8 | **Pure Rust (Zero C++ Run-time)** |
-| **Startup Time** | ~1,200 ms | ~40 ms | **< 5 ms** |
-| **WAF Bypass Mechanism** | Requires stealth plugins | Basic Header Spoofing | **Offline File Rendering (Zero TLS Leak)** |
-| **Multi-Language SDKs** | Yes | Partial | **✅ Rust, Python, Node, Go, Docker** |
-| **LLM Markdown Converter** | Needs 3rd party package | Basic HTML | **Native Built-in (~99% token saving)** |
-| **SERP & Multi-Modal Parser** | Manual parsing | None | **Built-in (AI Overview, Video, News)** |
-| **JSON-RPC / MCP Protocol** | Complex CDP (DevTools) | CDP subset | **Native JSON-RPC 2.0 via STDIN/STDOUT** |
+| **Idle Memory (RSS)** | ~120 MB | ~20 MB | **~9.4 MB** |
+| **Active Memory (1 Tab)** | ~350 MB – 600 MB | ~48 MB | **~15 MB – 32 MB** |
+| **Active Memory (5 Tabs)** | ~800 MB – 1.8 GB | ~180 MB | **~35.6 MB** |
+| **Native Windows Support** | ✅ Yes | ❌ WSL2 Required | **✅ Native Windows `.exe` + Linux + macOS** |
+| **Startup Latency** | ~800 ms – 1,500 ms | ~40 ms | **< 5 ms** |
+| **LLM Markdown Distillation** | Requires third-party library | Basic HTML dump | **Native AST Converter (~85% Token Reduction)** |
+| **Structured SERP Parsing** | Manual scraping required | None | **Built-in (AI Overviews, PAA, Knowledge Cards)** |
+| **Inter-Process Protocol** | Chrome DevTools Protocol (CDP) | Partial CDP | **Standard JSON-RPC 2.0 (Stdio / MCP)** |
 
 ---
 
-## 💻 Rust SDK Usage
+## 🤖 MCP Server & CLI Automation Example
 
-### Single-Tab Example
-```rust
-use headless_engine::{BrowserTab, DeviceProfile};
-
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    // Launch with Windows Chrome profile
-    let mut tab = BrowserTab::with_profile(DeviceProfile::ChromeWindows)?;
-
-    // Navigate to page
-    let report = tab.navigate("https://news.ycombinator.com/").await?;
-    println!("Title: {} (Status: {})", report.page_title, report.status);
-
-    // Extract clean LLM Markdown
-    let markdown = tab.extract_markdown(None).unwrap();
-    println!("Markdown Content:\n{}", markdown);
-
-    // Extract actionable links
-    for link in tab.extract_links().iter().take(5) {
-        println!("Link: [{}] -> {}", link.text, link.href);
-    }
-
-    Ok(())
-}
-```
-
-### Multi-Tab Concurrency (<50MB RAM)
-```rust
-use headless_engine::{BrowserEngine, DeviceProfile};
-
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    let mut engine = BrowserEngine::new()?;
-
-    // Create 2 isolated tabs
-    let tab1 = engine.create_tab(Some(DeviceProfile::ChromeWindows))?;
-    let tab2 = engine.create_tab(Some(DeviceProfile::SafariIos))?;
-
-    // Concurrent navigation
-    engine.get_tab_mut(&tab1).unwrap().navigate("https://google.com/").await?;
-    engine.get_tab_mut(&tab2).unwrap().navigate("https://github.com/trending").await?;
-
-    println!("Active Tabs: {}", engine.list_tabs().len());
-
-    Ok(())
-}
-```
-
----
-
-## 🤖 Go MCP Server Integration Example
+Headless Engine provides a standard JSON-RPC 2.0 interface over Stdio:
 
 ```go
 package main
@@ -217,7 +181,6 @@ func main() {
     scanner.Scan()
     fmt.Println("LLM Markdown:", scanner.Text())
 
-    // 3. Close
     cmd.Process.Kill()
 }
 ```
@@ -226,24 +189,23 @@ func main() {
 
 ## 📚 JSON-RPC 2.0 API Reference
 
-All methods can be called over standard I/O in `--stdio` mode:
-
-| Method | Params | Description |
+| Method | Parameters | Description |
 | :--- | :--- | :--- |
-| `tab.navigate` | `{ "url": "...", "tab_id": "..." }` | Navigates to target URL with anti-detection |
+| `tab.navigate` | `{ "url": "...", "tab_id": "..." }` | Navigates to target URL with fingerprint emulation |
+| `tab.setContent` | `{ "html": "...", "url": "...", "tab_id": "..." }` | Injects raw HTML into the tab for offline parsing |
 | `tab.extractMarkdown` | `{ "selector": "...", "tab_id": "..." }` | Returns filtered, token-efficient LLM Markdown |
-| `tab.extractResults` | `{ "tab_id": "..." }` | Returns multi-modal search data (AI Overview, news, video, images) |
-| `tab.extractLinks` | `{ "tab_id": "..." }` | Returns array of `{ text, href }` |
-| `tab.extractForms` | `{ "tab_id": "..." }` | Returns interactive form schemas & input attributes |
+| `tab.extractResults` | `{ "tab_id": "..." }` | Returns structured search entities (AI Overviews, PAA, results) |
+| `tab.extractLinks` | `{ "tab_id": "..." }` | Returns list of `{ text, href }` pairs |
+| `tab.extractForms` | `{ "tab_id": "..." }` | Returns interactive form schemas and inputs |
 | `tab.extractDom` | `{ "selector": "...", "tab_id": "..." }` | Returns raw HTML of page or CSS selector |
-| `tab.click` | `{ "target": "selector_or_text", "tab_id": "..." }` | Simulates link/button click & auto-navigates |
-| `tab.type` | `{ "selector": "...", "text": "...", "tab_id": "..." }` | Injects text into input field |
-| `tab.evaluateJs` | `{ "code": "...", "tab_id": "..." }` | Evaluates JavaScript in sandboxed runtime |
-| `tab.setProfile` | `{ "profile": "SafariMac", "tab_id": "..." }` | Updates device fingerprint |
+| `tab.click` | `{ "target": "selector_or_text", "tab_id": "..." }` | Simulates element click with auto-navigation |
+| `tab.type` | `{ "selector": "...", "text": "...", "tab_id": "..." }` | Simulates keyboard text input |
+| `tab.evaluateJs` | `{ "code": "...", "tab_id": "..." }` | Evaluates JavaScript expression in isolated runtime |
+| `tab.setProfile` | `{ "profile": "SafariMac", "tab_id": "..." }` | Updates active device fingerprint |
 | `engine.createTab` | `{ "profile": "ChromeWindows" }` | Spawns a new isolated tab, returns `tab_id` |
 | `engine.closeTab` | `{ "tab_id": "tab_1" }` | Closes and cleans up a tab instance |
-| `engine.listTabs` | `{}` | Lists all active tabs and profiles |
-| `shutdown` | `{}` | Gracefully terminates engine |
+| `engine.listTabs` | `{}` | Lists all active tabs and their profiles |
+| `shutdown` | `{}` | Gracefully terminates the engine process |
 
 ---
 
