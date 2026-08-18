@@ -249,11 +249,10 @@ async fn run_interactive_repl(
     proxy: Option<String>,
     timeout_secs: u64,
 ) -> anyhow::Result<()> {
-    eprintln!("\x1b[38;5;240m╭───────────────────────────────────────────────────────────────╮\x1b[0m");
-    eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[1;38;5;39mheadless-engine\x1b[0m \x1b[38;5;244mv1.0.0\x1b[0m                                   \x1b[38;5;240m│\x1b[0m");
-    eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[38;5;248mPure-Rust Headless Browser Engine for AI Agents & Scraping\x1b[0m   \x1b[38;5;240m│\x1b[0m");
-    eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[38;5;244mType a URL, search query, or /help for available commands\x1b[0m     \x1b[38;5;240m│\x1b[0m");
-    eprintln!("\x1b[38;5;240m╰───────────────────────────────────────────────────────────────╯\x1b[0m\n");
+    eprintln!("\x1b[38;5;240m╭─\x1b[0m \x1b[1;38;5;39mheadless-engine\x1b[0m \x1b[38;5;244mv1.0.0\x1b[0m");
+    eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[38;5;248mPure-Rust Headless Browser Engine for AI Agents & Scraping\x1b[0m");
+    eprintln!("\x1b[38;5;240m│\x1b[0m  \x1b[38;5;244mType a URL, search query, or /help for commands\x1b[0m");
+    eprintln!("\x1b[38;5;240m╰────────────────────────────────────────────────────────────\x1b[0m\n");
 
     let stdin = io::stdin();
     let mut reader = stdin.lock();
