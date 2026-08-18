@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" fill="none">
+  <!-- Clean, razor-sharp H geometry representing headless execution -->
+  <path d="M 64 48 L 64 208 M 192 48 L 192 208 M 64 128 L 192 128" stroke="#24292f" stroke-width="20" stroke-linecap="square" stroke-linejoin="miter"/>
+  <!-- Accent nodes -->
+  <circle cx="64" cy="48" r="16" fill="#f78166" />
+  <circle cx="192" cy="208" r="16" fill="#f78166" />
+  <!-- Minimalist framing box, open at the top and bottom to imply boundlessness -->
+  <path d="M 32 80 L 32 176 M 224 80 L 224 176" stroke="#24292f" stroke-width="8" stroke-linecap="square" />
+</svg>

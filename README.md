@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo.jpg" alt="Headless Engine Logo" width="200" height="200">
+  <img src="logo.svg" alt="Headless Engine Logo" width="128" height="128">
 </div>
 
 # Headless Engine (v1.0.0)
