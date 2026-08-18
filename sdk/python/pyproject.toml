@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "headless-engine"
+version = "0.2.0"
+description = "Ultra-lightweight (<30MB RAM), detection-free headless browser engine for AI agents, web scraping, and MCP servers."
+readme = "README.md"
+authors = [{ name = "Headless Engine Contributors" }]
+license = { text = "MIT OR Apache-2.0" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Rust",
+    "Topic :: Internet :: WWW/HTTP :: Browsers",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+requires-python = ">=3.8"
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/maintainers/headless-engine"
+Repository = "https://github.com/maintainers/headless-engine"

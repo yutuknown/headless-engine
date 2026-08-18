@@ -1,0 +1,23 @@
+{
+  "name": "headless-engine",
+  "version": "0.2.0",
+  "description": "Ultra-lightweight (<30MB RAM), detection-free headless browser engine for AI agents, web scraping, and MCP servers.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "headless-browser",
+    "ai-agent",
+    "mcp",
+    "scraping",
+    "lightweight",
+    "stealth"
+  ],
+  "author": "Headless Engine Contributors",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

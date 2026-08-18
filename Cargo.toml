@@ -1,0 +1,35 @@
+[package]
+name = "headless-engine"
+version = "1.0.0"
+edition = "2021"
+authors = ["Headless Engine Contributors <maintainers@antigravity.dev>"]
+description = "Ultra-lightweight (<30MB RAM), detection-free pure-Rust headless browser engine for AI agents, web scraping, and MCP servers."
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+keywords = ["headless-browser", "ai-agent", "mcp", "scraping", "stealth"]
+categories = ["web-programming", "command-line-utilities", "development-tools"]
+
+[dependencies]
+tokio = { version = "1.35", features = ["full"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "gzip", "brotli", "deflate", "cookies", "http2", "json", "socks", "blocking"] }
+scraper = "0.20"
+boa_engine = "0.17"
+html5ever = "0.26"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+clap = { version = "4.4", features = ["derive"] }
+resvg = "0.44"
+base64 = "0.22"
+
+[[bin]]
+name = "headless-engine"
+path = "src/main.rs"
+
+[[bin]]
+name = "demo_scrape"
+path = "src/bin/demo_scrape.rs"
+
+[lib]
+name = "headless_engine"
+path = "src/lib.rs"

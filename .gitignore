@@ -1,0 +1,19 @@
+# Rust build artifacts
+target/
+**/*.rs.bk
+Cargo.lock
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Debug and temporary dump files
+debug_page.html
+*.log
+*.tmp
+test.jsonl
+test_google.jsonl
