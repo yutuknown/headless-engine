@@ -1,15 +1,16 @@
 <div align="center">
-  <img src="logo.svg" alt="Headless Engine Logo" width="128" height="128">
-</div>
+  <img src="logo.svg" alt="Headless Engine Logo" width="500" height="120">
 
-# Headless Engine (v1.0.0)
+# Headless Engine
 
 > **Ultra-lightweight (<30MB RAM), detection-free pure-Rust headless browser engine built specifically for AI agents, web scraping, and Go-based MCP servers.**
 
 [![Rust](https://img.shields.io/badge/rust-stable-orange.svg)](https://www.rust-lang.org)
-[![License: MIT OR Apache-2.0](https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue.svg)]()
 [![Memory Footprint](https://img.shields.io/badge/RAM-~18MB-brightgreen.svg)]()
 [![Multi-Ecosystem](https://img.shields.io/badge/SDKs-Rust%20%7C%20Python%20%7C%20Node.js%20%7C%20Go%20%7C%20Docker-blueviolet.svg)]()
+</div>
+
 
 Unlike traditional headless browsers (Puppeteer, Playwright, Selenium) that spawn resource-heavy Chromium processes consuming 300MB–800MB of RAM per instance, **Headless Engine** is written entirely in pure Rust. It operates with an astonishing **<30MB RAM footprint**, allowing you to run 20+ concurrent browser sessions seamlessly on a single 512MB RAM server.
 
