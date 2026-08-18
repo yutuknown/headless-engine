@@ -22,21 +22,21 @@ Traditional headless browsers (such as Puppeteer or Playwright) orchestrate full
 
 ## Key Features
 
-- 🪶 **Low Memory Overhead:** Sub-10MB idle RSS and ~15–35MB under active browsing, enabling high-density concurrency on resource-constrained servers.
-- 🛡️ **Fingerprint Emulation & Anti-Detection:** Injects realistic client profiles (`navigator.webdriver = false`, full `window.chrome` hierarchy, WebGL ANGLE vendor/renderer masking, Client Hints, and session persistence).
-- 🤖 **Search & Knowledge Extraction:** Built-in extraction for Google AI Mode (`udm=50`), AI Overviews (SGE), Oxford Languages Knowledge Cards, YouTube video timestamps, and organic results.
-- 📝 **LLM-Ready Markdown Distillation:** Natively converts HTML DOM trees into clean Markdown by stripping navigation menus, ads, headers/footers, and boilerplate scripts (~85% token reduction).
-- ⚡ **Offline Ingestion & DOM Injection:** Ingest raw HTML strings or local files into active tabs via `browser.set_content(html)` or `file://` URIs for offline parsing and deterministic testing.
-- 📱 **Multi-Device Profiles:** Switch between Windows Chrome, Linux Chrome, macOS Safari, iOS Safari, and Android Chrome.
-- 🔌 **Universal Multi-Language Support:** First-class SDKs and bindings for **Rust**, **Python**, **Node.js / TypeScript**, **Go**, and **Docker**.
-- 🗂️ **Multi-Tab Isolation:** Built-in arena-allocated tab manager (`BrowserEngine`) for concurrent, isolated multi-tab automation.
-- 📡 **Standard JSON-RPC 2.0 Interface:** Connect over standard I/O for direct integration with AI agents and Model Context Protocol (MCP) servers.
+- **Low Memory Overhead:** Sub-10MB idle RSS and ~15–35MB under active browsing, enabling high-density concurrency on resource-constrained servers.
+- **Fingerprint Emulation & Anti-Detection:** Injects realistic client profiles (`navigator.webdriver = false`, full `window.chrome` hierarchy, WebGL ANGLE vendor/renderer masking, Client Hints, and session persistence).
+- **Search & Knowledge Extraction:** Built-in extraction for Google AI Mode (`udm=50`), AI Overviews (SGE), Oxford Languages Knowledge Cards, YouTube video timestamps, and organic results.
+- **LLM-Ready Markdown Distillation:** Natively converts HTML DOM trees into clean Markdown by stripping navigation menus, ads, headers/footers, and boilerplate scripts (~85% token reduction).
+- **Offline Ingestion & DOM Injection:** Ingest raw HTML strings or local files into active tabs via `browser.set_content(html)` or `file://` URIs for offline parsing and deterministic testing.
+- **Multi-Device Profiles:** Switch between Windows Chrome, Linux Chrome, macOS Safari, iOS Safari, and Android Chrome.
+- **Universal Multi-Language Support:** First-class SDKs and bindings for Rust, Python, Node.js / TypeScript, Go, and Docker.
+- **Multi-Tab Isolation:** Built-in arena-allocated tab manager (`BrowserEngine`) for concurrent, isolated multi-tab automation.
+- **Standard JSON-RPC 2.0 Interface:** Connect over standard I/O for direct integration with AI agents and Model Context Protocol (MCP) servers.
 
 ---
 
 ## Installation & Quick Start
 
-### 1. 🦀 Rust Crate
+### 1. Rust Crate
 ```bash
 cargo add headless-engine
 ```
@@ -56,7 +56,7 @@ async fn main() -> anyhow::Result<()> {
 }
 ```
 
-### 2. 🐍 Python SDK (`pip`)
+### 2. Python SDK (pip)
 ```bash
 pip install headless-engine
 ```
@@ -75,7 +75,7 @@ with HeadlessBrowser() as browser:
     results = browser.extract_results()
 ```
 
-### 3. 🟢 Node.js / TypeScript SDK (`npm`)
+### 3. Node.js / TypeScript SDK (npm)
 ```bash
 npm install headless-engine
 ```
@@ -89,7 +89,7 @@ console.log('Markdown:', markdown);
 browser.close();
 ```
 
-### 4. 🐹 Go Module
+### 4. Go Module
 ```bash
 go get github.com/yutuknown/headless-engine/sdk/go
 ```
@@ -111,12 +111,12 @@ func main() {
 }
 ```
 
-### 5. 🐳 Docker Container
+### 5. Docker Container
 ```bash
 docker run -d --name headless-engine -p 9222:9222 ghcr.io/yutuknown/headless-engine:latest
 ```
 
-### 6. ⚡ Standalone Binary Installers
+### 6. Standalone Binary Installers
 - **Linux & macOS:**
   ```bash
   curl -fsSL https://raw.githubusercontent.com/yutuknown/headless-engine/master/install.sh | bash
@@ -135,7 +135,7 @@ docker run -d --name headless-engine -p 9222:9222 ghcr.io/yutuknown/headless-eng
 | **Idle Memory (RSS)** | ~120 MB | ~20 MB | **~9.4 MB** |
 | **Active Memory (1 Tab)** | ~350 MB – 600 MB | ~48 MB | **~15 MB – 32 MB** |
 | **Active Memory (5 Tabs)** | ~800 MB – 1.8 GB | ~180 MB | **~35.6 MB** |
-| **Native Windows Support** | ✅ Yes | ❌ WSL2 Required | **✅ Native Windows `.exe` + Linux + macOS** |
+| **Native Windows Support** | Yes | No (WSL2 required) | **Yes (native Windows .exe + Linux + macOS)** |
 | **Startup Latency** | ~800 ms – 1,500 ms | ~40 ms | **< 5 ms** |
 | **LLM Markdown Distillation** | Requires third-party library | Basic HTML dump | **Native AST Converter (~85% Token Reduction)** |
 | **Structured SERP Parsing** | Manual scraping required | None | **Built-in (AI Overviews, PAA, Knowledge Cards)** |
@@ -143,7 +143,7 @@ docker run -d --name headless-engine -p 9222:9222 ghcr.io/yutuknown/headless-eng
 
 ---
 
-## 🤖 MCP Server & CLI Automation Example
+## MCP Server & CLI Automation Example
 
 Headless Engine provides a standard JSON-RPC 2.0 interface over Stdio:
 
@@ -191,7 +191,7 @@ func main() {
 
 ---
 
-## 📚 JSON-RPC 2.0 API Reference
+## JSON-RPC 2.0 API Reference
 
 | Method | Parameters | Description |
 | :--- | :--- | :--- |
@@ -213,7 +213,7 @@ func main() {
 
 ---
 
-## 📜 License
+## License
 
 Dual-licensed under either of:
 - Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE))
