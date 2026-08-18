@@ -11,7 +11,10 @@ async fn main() -> Result<()> {
     let url = "https://www.youtube.com/results?search_query=more+suhagan";
     let mut tab = BrowserTab::with_profile(DeviceProfile::ChromeWindows)?;
     let report = tab.navigate(url).await?;
-    println!("  * Navigated: {} (Status: {})", report.final_url, report.status);
+    println!(
+        "  * Navigated: {} (Status: {})",
+        report.final_url, report.status
+    );
 
     let search_results = tab.extract_search_results().expect("Expected results");
     println!("  * Videos found: {}", search_results.video_results.len());
@@ -25,7 +28,10 @@ async fn main() -> Result<()> {
         println!("  -> Fetching real image: {}", thumb_url);
         if let Ok(resp) = client.get(&thumb_url).send().await {
             if let Ok(bytes) = resp.bytes().await {
-                let b64 = format!("data:image/jpeg;base64,{}", base64::engine::general_purpose::STANDARD.encode(&bytes));
+                let b64 = format!(
+                    "data:image/jpeg;base64,{}",
+                    base64::engine::general_purpose::STANDARD.encode(&bytes)
+                );
                 thumbnail_base64_list.push(b64);
                 continue;
             }
@@ -33,7 +39,10 @@ async fn main() -> Result<()> {
         thumbnail_base64_list.push(String::new());
     }
 
-    println!("  * Successfully downloaded {} real video thumbnail images!", thumbnail_base64_list.len());
+    println!(
+        "  * Successfully downloaded {} real video thumbnail images!",
+        thumbnail_base64_list.len()
+    );
 
     // Build real SVG with embedded <image> tags
     let width = 1280;
@@ -60,9 +69,22 @@ async fn main() -> Result<()> {
         let agent_idx = idx + 1;
         let thumb_b64 = &thumbnail_base64_list[idx];
         let title_clean: String = video.title.chars().take(60).collect();
-        let title_escaped = title_clean.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;");
-        let channel_escaped = video.channel.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;");
-        let duration = if video.duration.is_empty() { "3:45" } else { &video.duration };
+        let title_escaped = title_clean
+            .replace('&', "&amp;")
+            .replace('<', "&lt;")
+            .replace('>', "&gt;")
+            .replace('"', "&quot;");
+        let channel_escaped = video
+            .channel
+            .replace('&', "&amp;")
+            .replace('<', "&lt;")
+            .replace('>', "&gt;")
+            .replace('"', "&quot;");
+        let duration = if video.duration.is_empty() {
+            "3:45"
+        } else {
+            &video.duration
+        };
 
         svg.push_str(&format!(
             "    <g transform=\"translate(0, {y})\">\n\
@@ -97,12 +119,19 @@ async fn main() -> Result<()> {
     let opt = resvg::usvg::Options::default();
     let tree = resvg::usvg::Tree::from_str(&svg, &opt)?;
     let mut pixmap = resvg::tiny_skia::Pixmap::new(width, height).unwrap();
-    resvg::render(&tree, resvg::tiny_skia::Transform::default(), &mut pixmap.as_mut());
+    resvg::render(
+        &tree,
+        resvg::tiny_skia::Transform::default(),
+        &mut pixmap.as_mut(),
+    );
     let png_bytes = pixmap.encode_png()?;
 
     fs::write("youtube_screenshot.png", &png_bytes)?;
     fs::write("youtube_screenshot.svg", &svg)?;
-    println!("  -> Saved 'youtube_screenshot.png' ({} bytes) with REAL image artwork!", png_bytes.len());
+    println!(
+        "  -> Saved 'youtube_screenshot.png' ({} bytes) with REAL image artwork!",
+        png_bytes.len()
+    );
 
     Ok(())
 }

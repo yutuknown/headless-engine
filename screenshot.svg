@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1200" width="1280" height="1200" style="background:#0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+<!-- Browser Chrome Header Bar -->
+<rect width="1280" height="80" fill="#1e293b" />
+<circle cx="25" cy="40" r="7" fill="#ef4444" />
+<circle cx="45" cy="40" r="7" fill="#f59e0b" />
+<circle cx="65" cy="40" r="7" fill="#10b981" />
+
+<!-- URL Address Bar -->
+<rect x="90" y="24" width="900" height="32" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1" />
+<text x="105" y="45" fill="#94a3b8" font-size="13">&#128274; https://news.ycombinator.com/</text>
+
+<!-- Page Title -->
+<text x="1010" y="45" fill="#e2e8f0" font-size="13" font-weight="600">Hacker News</text>
+
+<!-- Webpage Body Container -->
+<g transform="translate(60, 100)">
+    <text x="0" y="120" fill="#60a5fa" font-size="13">[2] Hacker News</text>
+    <text x="0" y="142" fill="#60a5fa" font-size="13">[3] new</text>
+    <text x="0" y="164" fill="#60a5fa" font-size="13">[4] past</text>
+    <text x="0" y="186" fill="#60a5fa" font-size="13">[5] comments</text>
+    <text x="0" y="208" fill="#60a5fa" font-size="13">[6] ask</text>
+    <text x="0" y="230" fill="#60a5fa" font-size="13">[7] show</text>
+    <text x="0" y="252" fill="#60a5fa" font-size="13">[8] jobs</text>
+    <text x="0" y="274" fill="#60a5fa" font-size="13">[9] submit</text>
+    <text x="0" y="296" fill="#60a5fa" font-size="13">[10] login</text>
+    <text x="0" y="318" fill="#60a5fa" font-size="13">[12] Using the railway network as a flatbed scanner</text>
+    <text x="0" y="340" fill="#60a5fa" font-size="13">[13] philo.gay</text>
+    <text x="0" y="362" fill="#60a5fa" font-size="13">[14] otherayden</text>
+    <text x="0" y="384" fill="#60a5fa" font-size="13">[15] 2 hours ago</text>
+    <text x="0" y="406" fill="#60a5fa" font-size="13">[16] hide</text>
+    <text x="0" y="428" fill="#60a5fa" font-size="13">[17] 35 comments</text>
+    <text x="0" y="450" fill="#60a5fa" font-size="13">[19] Fixing a Bricked Framework Laptop</text>
+    <text x="0" y="472" fill="#60a5fa" font-size="13">[20] quantum5.ca</text>
+    <text x="0" y="494" fill="#60a5fa" font-size="13">[21] jp_sc</text>
+    <text x="0" y="516" fill="#60a5fa" font-size="13">[15] 2 hours ago</text>
+    <text x="0" y="538" fill="#60a5fa" font-size="13">[16] hide</text>
+    <text x="0" y="560" fill="#60a5fa" font-size="13">[24] 44 comments</text>
+    <text x="0" y="582" fill="#60a5fa" font-size="13">[26] The Amazon Tax</text>
+    <text x="0" y="604" fill="#60a5fa" font-size="13">[27] seths.blog</text>
+    <text x="0" y="626" fill="#60a5fa" font-size="13">[28] herbertl</text>
+    <text x="0" y="648" fill="#60a5fa" font-size="13">[15] 2 hours ago</text>
+    <text x="0" y="670" fill="#60a5fa" font-size="13">[16] hide</text>
+    <text x="0" y="692" fill="#60a5fa" font-size="13">[31] 200 comments</text>
+    <text x="0" y="714" fill="#60a5fa" font-size="13">[33] Linux 7.3 improves performance when running out of vRAM</text>
+    <text x="0" y="736" fill="#60a5fa" font-size="13">[34] pixelcluster.dev</text>
+    <text x="0" y="758" fill="#60a5fa" font-size="13">[35] flaburgan</text>
+    <text x="0" y="780" fill="#60a5fa" font-size="13">[36] 7 hours ago</text>
+    <text x="0" y="802" fill="#60a5fa" font-size="13">[16] hide</text>
+    <text x="0" y="824" fill="#60a5fa" font-size="13">[38] 144 comments</text>
+    <text x="0" y="846" fill="#60a5fa" font-size="13">[40] Python Polars Cheatsheet (based on our O&apos;Reilly book)</text>
+    <text x="0" y="868" fill="#60a5fa" font-size="13">[41] posit.co</text>
+    <text x="0" y="890" fill="#60a5fa" font-size="13">[42] jeroenjanssens</text>
+    <text x="0" y="912" fill="#60a5fa" font-size="13">[43] 1 hour ago</text>
+    <text x="0" y="934" fill="#60a5fa" font-size="13">[16] hide</text>
+    <text x="0" y="956" fill="#60a5fa" font-size="13">[45] 7 comments</text>
+    <text x="0" y="978" fill="#60a5fa" font-size="13">[47] Teaching my kid to code with a modern MUD</text>
+    <text x="0" y="1000" fill="#60a5fa" font-size="13">[48] tau.dev</text>
+    <text x="0" y="1022" fill="#60a5fa" font-size="13">[49] andrewjanke</text>
+    <text x="0" y="1044" fill="#60a5fa" font-size="13">[50] 5 hours ago</text>
+    <text x="0" y="1066" fill="#60a5fa" font-size="13">[16] hide</text>
+    <text x="0" y="1088" fill="#60a5fa" font-size="13">[52] 36 comments</text>
+  </g>
+</svg>

@@ -2,11 +2,11 @@ pub mod interactive;
 pub mod markdown;
 pub mod screenshot;
 
-pub use interactive::{InteractiveElement, InteractiveParser, PageObservation};
-pub use screenshot::{PageRenderer, ScreenshotResult};
 use anyhow::Result;
+pub use interactive::{InteractiveElement, InteractiveParser, PageObservation};
 use markdown::HtmlToMarkdown;
 use scraper::{Html, Selector};
+pub use screenshot::{PageRenderer, ScreenshotResult};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -143,16 +143,34 @@ impl DomTree {
         InteractiveParser::parse(&self.raw_content, base_url)
     }
 
-    pub async fn screenshot_async(&self, url: &str, title: &str, base_url: Option<&str>) -> ScreenshotResult {
+    pub async fn screenshot_async(
+        &self,
+        url: &str,
+        title: &str,
+        base_url: Option<&str>,
+    ) -> ScreenshotResult {
         let interactive = self.extract_interactive_elements(base_url);
         let search_results = self.parse_google_search_results();
-        PageRenderer::render_async(url, title, &self.raw_content, &interactive, Some(&search_results)).await
+        PageRenderer::render_async(
+            url,
+            title,
+            &self.raw_content,
+            &interactive,
+            Some(&search_results),
+        )
+        .await
     }
 
     pub fn screenshot(&self, url: &str, title: &str, base_url: Option<&str>) -> ScreenshotResult {
         let interactive = self.extract_interactive_elements(base_url);
         let search_results = self.parse_google_search_results();
-        PageRenderer::render(url, title, &self.raw_content, &interactive, Some(&search_results))
+        PageRenderer::render(
+            url,
+            title,
+            &self.raw_content,
+            &interactive,
+            Some(&search_results),
+        )
     }
 
     pub fn extract_links(&self, base_url: Option<&str>) -> Vec<LinkInfo> {
@@ -185,7 +203,11 @@ impl DomTree {
 
                     if !links.iter().any(|l: &LinkInfo| l.href == full_url) {
                         links.push(LinkInfo {
-                            text: if text.is_empty() { full_url.clone() } else { text },
+                            text: if text.is_empty() {
+                                full_url.clone()
+                            } else {
+                                text
+                            },
                             href: full_url,
                         });
                     }
@@ -241,7 +263,8 @@ impl DomTree {
             || page_title.contains("unusual traffic")
             || self.raw_content.contains("sorry/index?continue=")
             || self.raw_content.contains("id=\"captcha-form\"")
-            || (self.raw_content.contains("challenges.cloudflare.com") && self.raw_content.contains("cf-turnstile-wrapper"))
+            || (self.raw_content.contains("challenges.cloudflare.com")
+                && self.raw_content.contains("cf-turnstile-wrapper"))
             || self.raw_content.contains("hcaptcha-box");
 
         let mut organic_results = Vec::new();
@@ -276,9 +299,16 @@ impl DomTree {
         }
 
         // 2. Knowledge Panel Extraction (Entities, Celebrities, Places, Organizations)
-        if let Ok(kp_title_sel) = Selector::parse("div[data-attrid='title'], h2[data-attrid='title'], div.BNeawe.vvjwJb") {
+        if let Ok(kp_title_sel) =
+            Selector::parse("div[data-attrid='title'], h2[data-attrid='title'], div.BNeawe.vvjwJb")
+        {
             if let Some(kp_title_el) = self.document.select(&kp_title_sel).next() {
-                let title = kp_title_el.text().collect::<Vec<_>>().join(" ").trim().to_string();
+                let title = kp_title_el
+                    .text()
+                    .collect::<Vec<_>>()
+                    .join(" ")
+                    .trim()
+                    .to_string();
                 if !title.is_empty() {
                     let subtitle = Selector::parse("div[data-attrid='subtitle'], div.BNeawe.UPmit")
                         .ok()
@@ -286,11 +316,12 @@ impl DomTree {
                         .map(|el| el.text().collect::<Vec<_>>().join(" ").trim().to_string())
                         .unwrap_or_default();
 
-                    let description = Selector::parse("div[data-attrid='description'], div.kno-rdesc")
-                        .ok()
-                        .and_then(|s| self.document.select(&s).next())
-                        .map(|el| el.text().collect::<Vec<_>>().join(" ").trim().to_string())
-                        .unwrap_or_default();
+                    let description =
+                        Selector::parse("div[data-attrid='description'], div.kno-rdesc")
+                            .ok()
+                            .and_then(|s| self.document.select(&s).next())
+                            .map(|el| el.text().collect::<Vec<_>>().join(" ").trim().to_string())
+                            .unwrap_or_default();
 
                     let mut attributes = Vec::new();
                     if let Ok(attr_sel) = Selector::parse("div.rVusze, div[data-attrid]:not([data-attrid='title']):not([data-attrid='subtitle'])") {
@@ -319,7 +350,9 @@ impl DomTree {
         }
 
         // 3. Google Images Mode Extraction (`udm=2` / `tbm=isch` / image galleries)
-        if let Ok(img_box_sel) = Selector::parse("div[data-ri], div.isv-r, div.F0uyec, div.eA0Zlc, table.e2BEnf") {
+        if let Ok(img_box_sel) =
+            Selector::parse("div[data-ri], div.isv-r, div.F0uyec, div.eA0Zlc, table.e2BEnf")
+        {
             let img_sel = Selector::parse("img").ok();
             let a_sel = Selector::parse("a[href]").ok();
 
@@ -327,7 +360,8 @@ impl DomTree {
                 let img_el = img_sel.as_ref().and_then(|s| img_box.select(s).next());
                 let image_url = img_el
                     .and_then(|img| {
-                        img.value().attr("src")
+                        img.value()
+                            .attr("src")
                             .or_else(|| img.value().attr("data-src"))
                             .or_else(|| img.value().attr("data-iurl"))
                     })
@@ -340,7 +374,12 @@ impl DomTree {
                     .unwrap_or_default()
                     .to_string();
 
-                let title = img_box.text().collect::<Vec<_>>().join(" ").trim().to_string();
+                let title = img_box
+                    .text()
+                    .collect::<Vec<_>>()
+                    .join(" ")
+                    .trim()
+                    .to_string();
                 let domain = if let Some(idx) = source_url.find("://") {
                     let after = &source_url[idx + 3..];
                     after.split('/').next().unwrap_or_default().to_string()
@@ -348,7 +387,11 @@ impl DomTree {
                     String::new()
                 };
 
-                if !image_url.is_empty() && !image_results.iter().any(|i: &ImageResult| i.image_url == image_url) {
+                if !image_url.is_empty()
+                    && !image_results
+                        .iter()
+                        .any(|i: &ImageResult| i.image_url == image_url)
+                {
                     image_results.push(ImageResult {
                         title,
                         image_url,
@@ -361,18 +404,23 @@ impl DomTree {
 
         // 4. YouTube Search InitialData Extraction
         if self.raw_content.contains("ytInitialData") {
-            if let Some(start_idx) = self.raw_content.find("var ytInitialData =")
+            if let Some(start_idx) = self
+                .raw_content
+                .find("var ytInitialData =")
                 .or_else(|| self.raw_content.find("ytInitialData ="))
             {
                 let rest = &self.raw_content[start_idx..];
                 if let Some(brace_idx) = rest.find('{') {
                     let json_str = &rest[brace_idx..];
-                    if let Some(semi_idx) = json_str.find(";</script>")
+                    if let Some(semi_idx) = json_str
+                        .find(";</script>")
                         .or_else(|| json_str.find(";\n"))
                         .or_else(|| json_str.find(";var "))
                     {
                         let candidate = &json_str[..semi_idx];
-                        if let Ok(parsed_json) = serde_json::from_str::<serde_json::Value>(candidate) {
+                        if let Ok(parsed_json) =
+                            serde_json::from_str::<serde_json::Value>(candidate)
+                        {
                             Self::extract_youtube_videos(&parsed_json, &mut video_results);
                         }
                     }
@@ -411,7 +459,10 @@ impl DomTree {
                     }
 
                     let (headline, source) = if let Some(idx) = full_title.rfind(" - ") {
-                        (full_title[..idx].trim().to_string(), full_title[idx + 3..].trim().to_string())
+                        (
+                            full_title[..idx].trim().to_string(),
+                            full_title[idx + 3..].trim().to_string(),
+                        )
                     } else {
                         (full_title.clone(), "Google News".to_string())
                     };
@@ -438,7 +489,13 @@ impl DomTree {
 
                     let snippet = {
                         let desc_doc = Html::parse_fragment(&desc_html);
-                        desc_doc.root_element().text().collect::<Vec<_>>().join(" ").trim().to_string()
+                        desc_doc
+                            .root_element()
+                            .text()
+                            .collect::<Vec<_>>()
+                            .join(" ")
+                            .trim()
+                            .to_string()
                     };
 
                     news_results.push(NewsResult {
@@ -477,7 +534,10 @@ impl DomTree {
                     .map(|sn| sn.text().collect::<Vec<_>>().join(" ").trim().to_string())
                     .unwrap_or_default();
 
-                if !title.is_empty() && !link.is_empty() && !organic_results.iter().any(|r| r.link == link) {
+                if !title.is_empty()
+                    && !link.is_empty()
+                    && !organic_results.iter().any(|r| r.link == link)
+                {
                     organic_results.push(OrganicResult {
                         title,
                         link,
@@ -492,7 +552,12 @@ impl DomTree {
             let a_selector = Selector::parse("a[href]").ok();
 
             for h3_el in self.document.select(&h3_selector) {
-                let title = h3_el.text().collect::<Vec<_>>().join(" ").trim().to_string();
+                let title = h3_el
+                    .text()
+                    .collect::<Vec<_>>()
+                    .join(" ")
+                    .trim()
+                    .to_string();
                 if title.is_empty()
                     || title.eq_ignore_ascii_case("search results")
                     || title.eq_ignore_ascii_case("people also ask")
@@ -548,7 +613,12 @@ impl DomTree {
                 let mut snippet = String::new();
                 if let Some(parent_node) = h3_el.parent().and_then(|p| p.parent()) {
                     if let Some(container_el) = scraper::ElementRef::wrap(parent_node) {
-                        let full_text = container_el.text().collect::<Vec<_>>().join(" ").trim().to_string();
+                        let full_text = container_el
+                            .text()
+                            .collect::<Vec<_>>()
+                            .join(" ")
+                            .trim()
+                            .to_string();
                         if full_text.starts_with(&title) {
                             snippet = full_text[title.len()..].trim().to_string();
                         } else {
@@ -560,7 +630,11 @@ impl DomTree {
                 // Check if this is a video result on Google Videos
                 if clean_url.contains("youtube.com/watch") || clean_url.contains("vimeo.com") {
                     let video_id = if let Some(idx) = clean_url.find("v=") {
-                        clean_url[idx + 2..].split('&').next().unwrap_or_default().to_string()
+                        clean_url[idx + 2..]
+                            .split('&')
+                            .next()
+                            .unwrap_or_default()
+                            .to_string()
                     } else {
                         String::new()
                     };
@@ -596,7 +670,10 @@ impl DomTree {
                         snippet.clone()
                     };
 
-                    if !news_results.iter().any(|n| n.headline == title || n.link == clean_url) {
+                    if !news_results
+                        .iter()
+                        .any(|n| n.headline == title || n.link == clean_url)
+                    {
                         news_results.push(NewsResult {
                             headline: title.clone(),
                             source,
@@ -617,7 +694,9 @@ impl DomTree {
         }
 
         // 8. People Also Ask / Related Questions
-        if let Ok(q_selector) = Selector::parse("div.cb7Db, div[data-q], div.related-question-pair, div.CSkcDe") {
+        if let Ok(q_selector) =
+            Selector::parse("div.cb7Db, div[data-q], div.related-question-pair, div.CSkcDe")
+        {
             for q_el in self.document.select(&q_selector) {
                 let q_text = q_el.text().collect::<Vec<_>>().join(" ").trim().to_string();
                 if !q_text.is_empty() && q_text.len() > 5 && !related_questions.contains(&q_text) {
@@ -626,7 +705,8 @@ impl DomTree {
             }
         }
 
-        let total_results_found = organic_results.len() + news_results.len() + video_results.len() + image_results.len();
+        let total_results_found =
+            organic_results.len() + news_results.len() + video_results.len() + image_results.len();
 
         SearchResults {
             page_title,

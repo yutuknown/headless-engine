@@ -21,8 +21,13 @@ async fn main() -> Result<()> {
     println!("  * HTML Size: {} bytes", report.html_bytes);
 
     // 2. Extract multi-modal video results
-    let results = tab.extract_search_results().expect("Expected search results");
-    println!("\n[2] Extracted Video Results Found: {}", results.video_results.len());
+    let results = tab
+        .extract_search_results()
+        .expect("Expected search results");
+    println!(
+        "\n[2] Extracted Video Results Found: {}",
+        results.video_results.len()
+    );
     for (i, v) in results.video_results.iter().take(5).enumerate() {
         println!("  [{}] Title: {}", i + 1, v.title);
         println!("      Channel: {} | Duration: {}", v.channel, v.duration);

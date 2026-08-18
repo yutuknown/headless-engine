@@ -59,8 +59,14 @@ impl HtmlToMarkdown {
             "a" => {
                 let href = element.value().attr("href").unwrap_or("");
                 let full_url = Self::resolve_url(href, base_url);
-                let text = element.text().collect::<Vec<_>>().join(" ").trim().to_string();
-                if !text.is_empty() && !full_url.is_empty() && !full_url.starts_with("javascript:") {
+                let text = element
+                    .text()
+                    .collect::<Vec<_>>()
+                    .join(" ")
+                    .trim()
+                    .to_string();
+                if !text.is_empty() && !full_url.is_empty() && !full_url.starts_with("javascript:")
+                {
                     output.push_str(&format!("[{}]({})", text, full_url));
                     return; // Handled children
                 }
@@ -99,7 +105,10 @@ impl HtmlToMarkdown {
                     } else {
                         let trimmed = raw.split_whitespace().collect::<Vec<_>>().join(" ");
                         if !trimmed.is_empty() {
-                            if raw.starts_with(char::is_whitespace) && !output.ends_with(' ') && !output.ends_with('\n') {
+                            if raw.starts_with(char::is_whitespace)
+                                && !output.ends_with(' ')
+                                && !output.ends_with('\n')
+                            {
                                 output.push(' ');
                             }
                             output.push_str(&trimmed);
@@ -180,7 +189,8 @@ impl HtmlToMarkdown {
         if href.is_empty() {
             return String::new();
         }
-        if href.starts_with("http://") || href.starts_with("https://") || href.starts_with("data:") {
+        if href.starts_with("http://") || href.starts_with("https://") || href.starts_with("data:")
+        {
             return href.to_string();
         }
         if let Some(base) = base_url {

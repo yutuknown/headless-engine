@@ -91,7 +91,11 @@ impl PaintEngine {
         let mut pixmap = resvg::tiny_skia::Pixmap::new(width, height)
             .ok_or_else(|| anyhow::anyhow!("Failed to allocate raster buffer"))?;
 
-        resvg::render(&tree, resvg::tiny_skia::Transform::default(), &mut pixmap.as_mut());
+        resvg::render(
+            &tree,
+            resvg::tiny_skia::Transform::default(),
+            &mut pixmap.as_mut(),
+        );
         let png_bytes = pixmap.encode_png()?;
 
         Ok((full_svg, png_bytes))
@@ -145,11 +149,12 @@ impl PaintEngine {
             LayoutContent::Text(txt) => {
                 if !txt.is_empty() {
                     let escaped = Self::xml_escape(txt);
-                    let weight = if box_node.style.font_weight == crate::render::css::FontWeight::Bold {
-                        " font-weight=\"bold\""
-                    } else {
-                        ""
-                    };
+                    let weight =
+                        if box_node.style.font_weight == crate::render::css::FontWeight::Bold {
+                            " font-weight=\"bold\""
+                        } else {
+                            ""
+                        };
 
                     let badge = if let Some(idx) = box_node.interactive_index {
                         format!("[{}] ", idx)

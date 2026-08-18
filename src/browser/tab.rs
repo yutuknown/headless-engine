@@ -65,7 +65,9 @@ impl BrowserTab {
         let page_title = search_results.page_title.clone();
         let html_bytes = fetch_result.html.len();
 
-        let _ = self.js.update_page_state(&fetch_result.final_url, &page_title);
+        let _ = self
+            .js
+            .update_page_state(&fetch_result.final_url, &page_title);
 
         self.dom = Some(dom);
         self.current_url = Some(fetch_result.final_url.clone());
@@ -113,19 +115,30 @@ impl BrowserTab {
     }
 
     pub fn extract_markdown(&self, selector: Option<&str>) -> Option<String> {
-        self.dom.as_ref().map(|d| d.extract_markdown(selector, self.current_url.as_deref()))
+        self.dom
+            .as_ref()
+            .map(|d| d.extract_markdown(selector, self.current_url.as_deref()))
     }
 
     pub fn extract_interactive_elements(&self) -> Vec<InteractiveElement> {
-        self.dom.as_ref().map(|d| d.extract_interactive_elements(self.current_url.as_deref())).unwrap_or_default()
+        self.dom
+            .as_ref()
+            .map(|d| d.extract_interactive_elements(self.current_url.as_deref()))
+            .unwrap_or_default()
     }
 
     pub fn extract_links(&self) -> Vec<LinkInfo> {
-        self.dom.as_ref().map(|d| d.extract_links(self.current_url.as_deref())).unwrap_or_default()
+        self.dom
+            .as_ref()
+            .map(|d| d.extract_links(self.current_url.as_deref()))
+            .unwrap_or_default()
     }
 
     pub fn extract_forms(&self) -> Vec<FormInfo> {
-        self.dom.as_ref().map(|d| d.extract_forms()).unwrap_or_default()
+        self.dom
+            .as_ref()
+            .map(|d| d.extract_forms())
+            .unwrap_or_default()
     }
 
     pub fn extract_search_results(&self) -> Option<SearchResults> {
@@ -136,7 +149,10 @@ impl BrowserTab {
         let dom = self.dom.as_ref()?;
         let url = self.current_url.as_deref().unwrap_or("about:blank");
         let results = dom.parse_google_search_results();
-        Some(dom.screenshot_async(url, &results.page_title, self.current_url.as_deref()).await)
+        Some(
+            dom.screenshot_async(url, &results.page_title, self.current_url.as_deref())
+                .await,
+        )
     }
 
     pub fn screenshot(&self) -> Option<crate::dom::ScreenshotResult> {
@@ -189,7 +205,9 @@ impl BrowserTab {
         if let Some(link) = links.iter().find(|l| {
             l.text.eq_ignore_ascii_case(selector_or_text)
                 || l.href.contains(selector_or_text)
-                || l.text.to_lowercase().contains(&selector_or_text.to_lowercase())
+                || l.text
+                    .to_lowercase()
+                    .contains(&selector_or_text.to_lowercase())
         }) {
             let report = self.navigate(&link.href).await?;
             return Ok(Some(report));
@@ -210,6 +228,7 @@ impl BrowserTab {
             "var el = document.querySelector('{}'); if (el) {{ el.value = '{}'; 'updated'; }} else {{ 'not_found'; }}",
             selector, text.replace('\'', "\\'")
         );
-        self.evaluate_js(&js_code).context("Failed to evaluate type action")
+        self.evaluate_js(&js_code)
+            .context("Failed to evaluate type action")
     }
 }

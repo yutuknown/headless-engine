@@ -287,7 +287,11 @@ impl CssParser {
     }
 
     fn parse_pixels(val: &str) -> Option<f32> {
-        let clean = val.trim().trim_end_matches("px").trim_end_matches("em").trim_end_matches("rem");
+        let clean = val
+            .trim()
+            .trim_end_matches("px")
+            .trim_end_matches("em")
+            .trim_end_matches("rem");
         clean.parse::<f32>().ok()
     }
 

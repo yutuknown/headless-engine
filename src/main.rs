@@ -94,7 +94,9 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Mode 2: Direct CLI Mode
-    let target = cli.target.unwrap_or_else(|| "https://en.wikipedia.org/wiki/Artificial_intelligence".to_string());
+    let target = cli
+        .target
+        .unwrap_or_else(|| "https://en.wikipedia.org/wiki/Artificial_intelligence".to_string());
 
     let mut builder = BrowserBuilder::new()
         .profile(profile)
@@ -106,22 +108,29 @@ async fn main() -> anyhow::Result<()> {
 
     let mut tab = builder.build()?;
 
-    let target_url = if cli.search && !target.starts_with("http://") && !target.starts_with("https://") {
-        format!("https://www.google.com/search?q={}", urlencoding_simple(&target))
-    } else {
-        target
-    };
+    let target_url =
+        if cli.search && !target.starts_with("http://") && !target.starts_with("https://") {
+            format!(
+                "https://www.google.com/search?q={}",
+                urlencoding_simple(&target)
+            )
+        } else {
+            target
+        };
 
     let report = tab.navigate(&target_url).await?;
 
     if cli.markdown {
         let md = tab.extract_markdown(None).unwrap_or_default();
         if cli.json {
-            println!("{}", serde_json::to_string_pretty(&serde_json::json!({
-                "url": report.final_url,
-                "title": report.page_title,
-                "markdown": md
-            }))?);
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&serde_json::json!({
+                    "url": report.final_url,
+                    "title": report.page_title,
+                    "markdown": md
+                }))?
+            );
         } else {
             println!("{}", md);
         }
@@ -141,21 +150,27 @@ async fn main() -> anyhow::Result<()> {
         let md = tab.extract_markdown(None).unwrap_or_default();
         let links = tab.extract_links();
         let forms = tab.extract_forms();
-        println!("{}", serde_json::to_string_pretty(&serde_json::json!({
-            "navigation": report,
-            "markdown": md,
-            "links_count": links.len(),
-            "forms_count": forms.len(),
-            "links": links.into_iter().take(20).collect::<Vec<_>>(),
-            "forms": forms
-        }))?);
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&serde_json::json!({
+                "navigation": report,
+                "markdown": md,
+                "links_count": links.len(),
+                "forms_count": forms.len(),
+                "links": links.into_iter().take(20).collect::<Vec<_>>(),
+                "forms": forms
+            }))?
+        );
         return Ok(());
     }
 
     // Minimalist logging (Lightpanda UX style, professional ASCII)
     let time_fmt = || {
         let now = std::time::SystemTime::now();
-        let secs = now.duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_secs();
+        let secs = now
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
         let h = (secs / 3600) % 24;
         let m = (secs / 60) % 60;
         let s = secs % 60;
@@ -178,12 +193,23 @@ async fn main() -> anyhow::Result<()> {
         };
     }
 
-    let status_color = if report.status == 200 { "\x1b[32m" } else { "\x1b[33m" };
-    success!("Navigation complete [Status: {}{}\x1b[0m | Target: \x1b[36m{}\x1b[0m]", 
-        status_color, report.status, report.final_url);
-        
+    let status_color = if report.status == 200 {
+        "\x1b[32m"
+    } else {
+        "\x1b[33m"
+    };
+    success!(
+        "Navigation complete [Status: {}{}\x1b[0m | Target: \x1b[36m{}\x1b[0m]",
+        status_color,
+        report.status,
+        report.final_url
+    );
+
     step!("Page Title: \x1b[36m{}\x1b[0m", report.page_title);
-    success!("Transferred: \x1b[36m{:.2} MB\x1b[0m", report.html_bytes as f64 / 1_048_576.0);
+    success!(
+        "Transferred: \x1b[36m{:.2} MB\x1b[0m",
+        report.html_bytes as f64 / 1_048_576.0
+    );
 
     if report.is_captcha_detected {
         warn!("Captcha challenge detected on target page");
@@ -195,8 +221,12 @@ async fn main() -> anyhow::Result<()> {
 
     let links = tab.extract_links();
     let forms = tab.extract_forms();
-    success!("Extracted \x1b[36m{}\x1b[0m actionable links and \x1b[36m{}\x1b[0m interactive forms", links.len(), forms.len());
-    
+    success!(
+        "Extracted \x1b[36m{}\x1b[0m actionable links and \x1b[36m{}\x1b[0m interactive forms",
+        links.len(),
+        forms.len()
+    );
+
     step!("Use --markdown to dump raw payload, --search for SERP JSON, or --stdio for MCP.");
 
     Ok(())

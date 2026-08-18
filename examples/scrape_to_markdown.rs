@@ -15,7 +15,8 @@ async fn main() -> Result<()> {
     println!(">>> Raw HTML Size: {} bytes", report.html_bytes);
 
     let markdown = tab.extract_markdown(None).unwrap_or_default();
-    println!(">>> Markdown Size: {} bytes (~{:.1}% compression)",
+    println!(
+        ">>> Markdown Size: {} bytes (~{:.1}% compression)",
         markdown.len(),
         (1.0 - (markdown.len() as f64 / report.html_bytes as f64)) * 100.0
     );

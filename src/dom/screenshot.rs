@@ -46,11 +46,13 @@ impl RealBrowserScreenshot {
                 }
             }
             if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
-                let chrome_local = Path::new(&local_app_data).join(r"Google\Chrome\Application\chrome.exe");
+                let chrome_local =
+                    Path::new(&local_app_data).join(r"Google\Chrome\Application\chrome.exe");
                 if chrome_local.exists() {
                     return Some(chrome_local);
                 }
-                let edge_local = Path::new(&local_app_data).join(r"Microsoft\Edge\Application\msedge.exe");
+                let edge_local =
+                    Path::new(&local_app_data).join(r"Microsoft\Edge\Application\msedge.exe");
                 if edge_local.exists() {
                     return Some(edge_local);
                 }
@@ -58,14 +60,28 @@ impl RealBrowserScreenshot {
             // Dynamic fallback
             if let Ok(output) = std::process::Command::new("where").arg("chrome").output() {
                 if output.status.success() {
-                    let path_str = String::from_utf8_lossy(&output.stdout).lines().next().unwrap_or("").trim().to_string();
-                    if !path_str.is_empty() { return Some(PathBuf::from(path_str)); }
+                    let path_str = String::from_utf8_lossy(&output.stdout)
+                        .lines()
+                        .next()
+                        .unwrap_or("")
+                        .trim()
+                        .to_string();
+                    if !path_str.is_empty() {
+                        return Some(PathBuf::from(path_str));
+                    }
                 }
             }
             if let Ok(output) = std::process::Command::new("where").arg("msedge").output() {
                 if output.status.success() {
-                    let path_str = String::from_utf8_lossy(&output.stdout).lines().next().unwrap_or("").trim().to_string();
-                    if !path_str.is_empty() { return Some(PathBuf::from(path_str)); }
+                    let path_str = String::from_utf8_lossy(&output.stdout)
+                        .lines()
+                        .next()
+                        .unwrap_or("")
+                        .trim()
+                        .to_string();
+                    if !path_str.is_empty() {
+                        return Some(PathBuf::from(path_str));
+                    }
                 }
             }
         }
@@ -84,17 +100,27 @@ impl RealBrowserScreenshot {
                 }
             }
             // Dynamic fallback
-            if let Ok(output) = std::process::Command::new("which").arg("google-chrome").output() {
+            if let Ok(output) = std::process::Command::new("which")
+                .arg("google-chrome")
+                .output()
+            {
                 if output.status.success() {
                     let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
-                    if !path_str.is_empty() { return Some(PathBuf::from(path_str)); }
+                    if !path_str.is_empty() {
+                        return Some(PathBuf::from(path_str));
+                    }
                 }
             }
         }
 
         #[cfg(target_os = "linux")]
         {
-            let candidates = ["google-chrome", "google-chrome-stable", "chromium", "chromium-browser"];
+            let candidates = [
+                "google-chrome",
+                "google-chrome-stable",
+                "chromium",
+                "chromium-browser",
+            ];
             for bin in &candidates {
                 if let Ok(output) = Command::new("which").arg(bin).output() {
                     if output.status.success() {
@@ -113,7 +139,10 @@ impl RealBrowserScreenshot {
     fn generate_temp_png_path() -> PathBuf {
         let temp_dir = std::env::temp_dir();
         let pid = std::process::id();
-        let time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_millis()).unwrap_or(0);
+        let time = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_millis())
+            .unwrap_or(0);
         static COUNTER: AtomicUsize = AtomicUsize::new(0);
         let count = COUNTER.fetch_add(1, Ordering::Relaxed);
         temp_dir.join(format!("headless_shot_{}_{}_{}.png", pid, time, count))
@@ -134,11 +163,11 @@ impl RealBrowserScreenshot {
         }
 
         let browser_bin = Self::find_browser_binary()?;
-        
+
         let temp_png = Self::generate_temp_png_path();
         let mut temp_html = temp_png.clone();
         temp_html.set_extension("html");
-        
+
         let mut injected_html = html_str.to_string();
         let base_tag = format!("<base href=\"{}\">", url);
         if let Some(idx) = injected_html.find("<head>") {
@@ -150,15 +179,18 @@ impl RealBrowserScreenshot {
         } else {
             injected_html.insert_str(0, &base_tag);
         }
-        
+
         let _ = std::fs::write(&temp_html, injected_html);
-        
+
         let _cleanup_png = TempFileCleanup(temp_png.clone());
         let _cleanup_html = TempFileCleanup(temp_html.clone());
-        
+
         let temp_png_str = temp_png.to_string_lossy().to_string();
-        let temp_html_str = format!("file:///{}", temp_html.to_string_lossy().to_string().replace('\\', "/"));
-        
+        let temp_html_str = format!(
+            "file:///{}",
+            temp_html.to_string_lossy().to_string().replace('\\', "/")
+        );
+
         let screenshot_arg = format!("--screenshot={}", temp_png_str);
         let window_size_arg = format!("--window-size={},{}", width, height);
 
@@ -177,7 +209,9 @@ impl RealBrowserScreenshot {
         cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
 
         if let Ok(child) = cmd.spawn() {
-            let _ = tokio::time::timeout(std::time::Duration::from_secs(12), child.wait_with_output()).await;
+            let _ =
+                tokio::time::timeout(std::time::Duration::from_secs(12), child.wait_with_output())
+                    .await;
         }
 
         if temp_png.exists() {
@@ -211,11 +245,11 @@ impl RealBrowserScreenshot {
         }
 
         let browser_bin = Self::find_browser_binary()?;
-        
+
         let temp_png = Self::generate_temp_png_path();
         let mut temp_html = temp_png.clone();
         temp_html.set_extension("html");
-        
+
         let mut injected_html = html_str.to_string();
         let base_tag = format!("<base href=\"{}\">", url);
         if let Some(idx) = injected_html.find("<head>") {
@@ -227,15 +261,18 @@ impl RealBrowserScreenshot {
         } else {
             injected_html.insert_str(0, &base_tag);
         }
-        
+
         let _ = std::fs::write(&temp_html, injected_html);
-        
+
         let _cleanup_png = TempFileCleanup(temp_png.clone());
         let _cleanup_html = TempFileCleanup(temp_html.clone());
-        
+
         let temp_png_str = temp_png.to_string_lossy().to_string();
-        let temp_html_str = format!("file:///{}", temp_html.to_string_lossy().to_string().replace('\\', "/"));
-        
+        let temp_html_str = format!(
+            "file:///{}",
+            temp_html.to_string_lossy().to_string().replace('\\', "/")
+        );
+
         let screenshot_arg = format!("--screenshot={}", temp_png_str);
         let window_size_arg = format!("--window-size={},{}", width, height);
 
@@ -307,14 +344,25 @@ impl PageRenderer {
         let height = 720;
 
         // Try one-shot ultra-light real browser screenshot first
-        if let Some(real_shot) = RealBrowserScreenshot::capture_real_screenshot_async(url, html_str, width, height).await {
+        if let Some(real_shot) =
+            RealBrowserScreenshot::capture_real_screenshot_async(url, html_str, width, height).await
+        {
             return real_shot;
         }
 
         // Fallback to pure-Rust layout & rasterization engine
-        crate::render::HtmlRenderer::render_html_to_screenshot(url, title, html_str, interactive, width, height)
-            .await
-            .unwrap_or_else(|_| Self::render_general_page(url, title, html_str, interactive, width, height))
+        crate::render::HtmlRenderer::render_html_to_screenshot(
+            url,
+            title,
+            html_str,
+            interactive,
+            width,
+            height,
+        )
+        .await
+        .unwrap_or_else(|_| {
+            Self::render_general_page(url, title, html_str, interactive, width, height)
+        })
     }
 
     pub fn render(
@@ -327,7 +375,9 @@ impl PageRenderer {
         let width = 1280;
         let height = 720;
 
-        if let Some(real_shot) = RealBrowserScreenshot::capture_real_screenshot_sync(url, html_str, width, height) {
+        if let Some(real_shot) =
+            RealBrowserScreenshot::capture_real_screenshot_sync(url, html_str, width, height)
+        {
             return real_shot;
         }
 
@@ -378,10 +428,16 @@ impl PageRenderer {
         );
 
         let mut wireframe_lines = Vec::new();
-        wireframe_lines.push("╔══════════════════════════════════════════════════════════════════════════════╗".to_string());
+        wireframe_lines.push(
+            "╔══════════════════════════════════════════════════════════════════════════════╗"
+                .to_string(),
+        );
         wireframe_lines.push(format!("║ URL: {:<72} ║", url));
         wireframe_lines.push(format!("║ TITLE: {:<70} ║", title));
-        wireframe_lines.push("╠══════════════════════════════════════════════════════════════════════════════╣".to_string());
+        wireframe_lines.push(
+            "╠══════════════════════════════════════════════════════════════════════════════╣"
+                .to_string(),
+        );
 
         for (tag, text, index_opt) in &visual_blocks {
             let truncated_text: String = text.chars().take(80).collect();
@@ -406,7 +462,11 @@ impl PageRenderer {
                 }
                 _ => {
                     let badge = index_opt.map(|i| format!("[{}] ", i)).unwrap_or_default();
-                    let color = if index_opt.is_some() { "#60a5fa" } else { "#cbd5e1" };
+                    let color = if index_opt.is_some() {
+                        "#60a5fa"
+                    } else {
+                        "#cbd5e1"
+                    };
                     svg.push_str(&format!(
                         "    <text x=\"0\" y=\"{}\" fill=\"{}\" font-size=\"13\">{}{}</text>\n",
                         y_offset, color, badge, escaped_text
@@ -426,7 +486,10 @@ impl PageRenderer {
         }
 
         svg.push_str("  </g>\n</svg>");
-        wireframe_lines.push("╚══════════════════════════════════════════════════════════════════════════════╝".to_string());
+        wireframe_lines.push(
+            "╚══════════════════════════════════════════════════════════════════════════════╝"
+                .to_string(),
+        );
 
         let png_bytes = Self::render_png(&svg, width, height).unwrap_or_default();
         let png_base64 = if !png_bytes.is_empty() {
@@ -458,7 +521,11 @@ impl PageRenderer {
         let mut pixmap = resvg::tiny_skia::Pixmap::new(width, height)
             .ok_or_else(|| anyhow::anyhow!("Failed to allocate raster pixmap"))?;
 
-        resvg::render(&tree, resvg::tiny_skia::Transform::default(), &mut pixmap.as_mut());
+        resvg::render(
+            &tree,
+            resvg::tiny_skia::Transform::default(),
+            &mut pixmap.as_mut(),
+        );
         let png_data = pixmap.encode_png()?;
         Ok(png_data)
     }

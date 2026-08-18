@@ -21,7 +21,12 @@ async fn main() -> Result<()> {
 
     // Print text wireframe preview
     println!("\n>>> ASCII WIREFRAME PREVIEW (FOR AGENT VISION TOKENS):");
-    let preview: String = shot.layout_wireframe.lines().take(18).collect::<Vec<_>>().join("\n");
+    let preview: String = shot
+        .layout_wireframe
+        .lines()
+        .take(18)
+        .collect::<Vec<_>>()
+        .join("\n");
     println!("{}", preview);
 
     Ok(())

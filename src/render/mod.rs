@@ -21,7 +21,8 @@ impl HtmlRenderer {
         height: u32,
     ) -> Result<ScreenshotResult> {
         let root_box = LayoutEngine::build_and_layout(html_str, interactive, width as f32);
-        let (svg, png_bytes) = PaintEngine::paint_to_svg_and_png(url, title, &root_box, width, height).await?;
+        let (svg, png_bytes) =
+            PaintEngine::paint_to_svg_and_png(url, title, &root_box, width, height).await?;
 
         let png_base64 = if !png_bytes.is_empty() {
             format!(

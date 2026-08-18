@@ -96,13 +96,20 @@ impl NetworkClient {
             .context("Failed to decode response body")?;
 
         // If Google serves the SGS dynamic challenge on search queries, extract live results seamlessly
-        if url.contains("google.com/search") && html.contains("Google Search") && html.len() < 100000 && !html.contains("<h3") {
+        if url.contains("google.com/search")
+            && html.contains("Google Search")
+            && html.len() < 100000
+            && !html.contains("<h3")
+        {
             if let Some(q_idx) = url.find("q=") {
                 let after_q = &url[q_idx + 2..];
                 let end_idx = after_q.find('&').unwrap_or(after_q.len());
                 let query = &after_q[..end_idx];
 
-                let news_url = format!("https://news.google.com/rss/search?q={}&hl=en-US&gl=US&ceid=US:en", query);
+                let news_url = format!(
+                    "https://news.google.com/rss/search?q={}&hl=en-US&gl=US&ceid=US:en",
+                    query
+                );
                 if let Ok(news_resp) = self.client.get(&news_url).send().await {
                     if let Ok(news_body) = news_resp.text().await {
                         if news_body.contains("<item>") {
@@ -116,7 +123,8 @@ impl NetworkClient {
         let is_captcha_detected = html.contains("sorry/index?continue=")
             || html.contains("Our systems have detected unusual traffic")
             || html.contains("id=\"captcha-form\"")
-            || (html.contains("challenges.cloudflare.com") && html.contains("cf-turnstile-wrapper"))
+            || (html.contains("challenges.cloudflare.com")
+                && html.contains("cf-turnstile-wrapper"))
             || html.contains("hcaptcha-box");
 
         Ok(FetchResult {

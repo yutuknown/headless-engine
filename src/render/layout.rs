@@ -71,12 +71,23 @@ impl LayoutEngine {
         }
 
         // Check if matching interactive element
-        let text_content = element.text().collect::<Vec<_>>().join(" ").trim().to_string();
-        let interactive_index = interactive.iter().find(|i| {
-            (!i.text.is_empty() && i.text == text_content)
-                || (element.value().attr("id").is_some_and(|id| id == i.name || i.selector.contains(id)))
-                || (element.value().attr("name").is_some_and(|n| n == i.name))
-        }).map(|i| i.index);
+        let text_content = element
+            .text()
+            .collect::<Vec<_>>()
+            .join(" ")
+            .trim()
+            .to_string();
+        let interactive_index = interactive
+            .iter()
+            .find(|i| {
+                (!i.text.is_empty() && i.text == text_content)
+                    || (element
+                        .value()
+                        .attr("id")
+                        .is_some_and(|id| id == i.name || i.selector.contains(id)))
+                    || (element.value().attr("name").is_some_and(|n| n == i.name))
+            })
+            .map(|i| i.index);
 
         let mut children = Vec::new();
 
@@ -84,7 +95,12 @@ impl LayoutEngine {
             let src = element.value().attr("src").unwrap_or("").to_string();
             let alt = element.value().attr("alt").unwrap_or("").to_string();
             return LayoutBox {
-                rect: Rect { x: 0.0, y: 0.0, width: 320.0, height: 180.0 },
+                rect: Rect {
+                    x: 0.0,
+                    y: 0.0,
+                    width: 320.0,
+                    height: 180.0,
+                },
                 style,
                 content: LayoutContent::Image { src, alt },
                 interactive_index,
@@ -105,7 +121,12 @@ impl LayoutEngine {
                     let text = txt.text.trim().to_string();
                     if !text.is_empty() {
                         children.push(LayoutBox {
-                            rect: Rect { x: 0.0, y: 0.0, width: 0.0, height: 0.0 },
+                            rect: Rect {
+                                x: 0.0,
+                                y: 0.0,
+                                width: 0.0,
+                                height: 0.0,
+                            },
                             style: style.clone(),
                             content: LayoutContent::Text(text),
                             interactive_index: None,
@@ -117,7 +138,12 @@ impl LayoutEngine {
         }
 
         LayoutBox {
-            rect: Rect { x: 0.0, y: 0.0, width: 0.0, height: 0.0 },
+            rect: Rect {
+                x: 0.0,
+                y: 0.0,
+                width: 0.0,
+                height: 0.0,
+            },
             style,
             content: LayoutContent::Element { tag, children },
             interactive_index,
@@ -136,7 +162,8 @@ impl LayoutEngine {
             LayoutContent::Text(txt) => {
                 let char_count = txt.chars().count();
                 let approx_line_width = available_width.max(100.0);
-                let chars_per_line = (approx_line_width / (box_node.style.font_size * 0.55)).max(10.0) as usize;
+                let chars_per_line =
+                    (approx_line_width / (box_node.style.font_size * 0.55)).max(10.0) as usize;
                 let lines_count = (char_count / chars_per_line).max(1);
                 let height = lines_count as f32 * (box_node.style.font_size * 1.4);
 
@@ -164,12 +191,15 @@ impl LayoutEngine {
                 let element_width = box_node.style.width.unwrap_or(available_width);
                 let mut current_child_y = start_y + box_node.style.padding_top;
 
-                if box_node.style.display == Display::Flex && box_node.style.flex_direction == FlexDirection::Row {
+                if box_node.style.display == Display::Flex
+                    && box_node.style.flex_direction == FlexDirection::Row
+                {
                     // Flex row layout
                     let mut child_x = start_x;
                     let mut max_row_height: f32 = 0.0;
                     let child_width = if !children.is_empty() {
-                        (element_width - (box_node.style.gap * (children.len() as f32 - 1.0))) / children.len() as f32
+                        (element_width - (box_node.style.gap * (children.len() as f32 - 1.0)))
+                            / children.len() as f32
                     } else {
                         element_width
                     };

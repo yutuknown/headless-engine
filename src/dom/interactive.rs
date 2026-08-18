@@ -27,7 +27,10 @@ impl InteractiveElement {
             } else {
                 format!("type=\"{}\"", self.input_type)
             };
-            format!("[{}] <input {}> (value=\"{}\")", self.index, label, self.value)
+            format!(
+                "[{}] <input {}> (value=\"{}\")",
+                self.index, label, self.value
+            )
         } else if self.tag == "button" || self.role == "button" {
             format!("[{}] <button \"{}\">", self.index, self.text)
         } else if self.tag == "a" {
@@ -73,13 +76,20 @@ impl InteractiveParser {
             let class = el.value().attr("class").unwrap_or("").to_string();
 
             // Skip hidden inputs and disabled elements
-            if input_type == "hidden" || el.value().attr("disabled").is_some() || el.value().attr("aria-hidden") == Some("true") {
+            if input_type == "hidden"
+                || el.value().attr("disabled").is_some()
+                || el.value().attr("aria-hidden") == Some("true")
+            {
                 continue;
             }
 
             let mut text = el.text().collect::<Vec<_>>().join(" ").trim().to_string();
             if text.is_empty() {
-                if let Some(aria_label) = el.value().attr("aria-label").or_else(|| el.value().attr("title")) {
+                if let Some(aria_label) = el
+                    .value()
+                    .attr("aria-label")
+                    .or_else(|| el.value().attr("title"))
+                {
                     text = aria_label.trim().to_string();
                 }
             }
@@ -93,12 +103,21 @@ impl InteractiveParser {
             };
 
             // Skip empty non-input elements
-            if text.is_empty() && href.is_empty() && placeholder.is_empty() && name.is_empty() && id.is_empty() {
+            if text.is_empty()
+                && href.is_empty()
+                && placeholder.is_empty()
+                && name.is_empty()
+                && id.is_empty()
+            {
                 continue;
             }
 
             let is_input = tag == "input" || tag == "textarea" || tag == "select";
-            let is_clickable = tag == "a" || tag == "button" || role == "button" || role == "link" || el.value().attr("onclick").is_some();
+            let is_clickable = tag == "a"
+                || tag == "button"
+                || role == "button"
+                || role == "link"
+                || el.value().attr("onclick").is_some();
 
             // Build unique CSS selector
             let css_selector = if !id.is_empty() {

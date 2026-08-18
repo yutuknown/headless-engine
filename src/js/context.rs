@@ -8,7 +8,8 @@ pub struct JsRuntime {
 
 impl JsRuntime {
     pub fn new() -> Result<Self> {
-        let default_fp = Fingerprint::for_profile(crate::network::fingerprint::DeviceProfile::ChromeWindows);
+        let default_fp =
+            Fingerprint::for_profile(crate::network::fingerprint::DeviceProfile::ChromeWindows);
         Self::with_fingerprint(&default_fp)
     }
 

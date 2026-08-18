@@ -79,18 +79,12 @@ impl Fingerprint {
                 "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
             ),
         );
-        headers.insert(
-            ACCEPT_LANGUAGE,
-            HeaderValue::from_static("en-US,en;q=0.9"),
-        );
+        headers.insert(ACCEPT_LANGUAGE, HeaderValue::from_static("en-US,en;q=0.9"));
         headers.insert(
             ACCEPT_ENCODING,
             HeaderValue::from_static("gzip, deflate, br"),
         );
-        headers.insert(
-            UPGRADE_INSECURE_REQUESTS,
-            HeaderValue::from_static("1"),
-        );
+        headers.insert(UPGRADE_INSECURE_REQUESTS, HeaderValue::from_static("1"));
         headers.insert(DNT, HeaderValue::from_static("1"));
 
         match self.profile {

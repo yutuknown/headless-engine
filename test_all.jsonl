@@ -1,0 +1,9 @@
+{"method": "Navigate", "params": {"url": "https://www.google.com/search?q=what+is+companionship+and+latest+news+on+it&oq=what+is+companionship+and+latest+news+on+it&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIHCAEQIRiPAtIBCTE0NzA2ajBqN6gCALACAA&sourceid=chrome&source=chrome.ob&ie=UTF-8"}}
+{"method": "ExtractResults"}
+{"method": "EvaluateJs", "params": {"code": "document.title"}}
+{"method": "EvaluateJs", "params": {"code": "navigator.userAgent"}}
+{"method": "EvaluateJs", "params": {"code": "navigator.webdriver"}}
+{"method": "Navigate", "params": {"url": "https://html.duckduckgo.com/html/?q=pure+rust+headless+browser+engine"}}
+{"method": "ExtractResults"}
+{"method": "EvaluateJs", "params": {"code": "document.title"}}
+{"method": "Shutdown"}

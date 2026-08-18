@@ -80,7 +80,8 @@ impl JsonRpcHandler {
         match method {
             // Engine Methods
             "engine.createTab" | "createTab" => {
-                let profile: Option<DeviceProfile> = params.get("profile")
+                let profile: Option<DeviceProfile> = params
+                    .get("profile")
                     .and_then(|p| serde_json::from_value(p.clone()).ok());
                 match self.engine.create_tab(profile) {
                     Ok(tab_id) => RpcResponse::success(id, serde_json::json!({ "tab_id": tab_id })),
@@ -110,7 +111,9 @@ impl JsonRpcHandler {
                 match tab.navigate(url).await {
                     Ok(report) => match serde_json::to_value(report) {
                         Ok(v) => RpcResponse::success(id, v),
-                        Err(e) => RpcResponse::error(id, -32000, format!("Serialization failed: {}", e)),
+                        Err(e) => {
+                            RpcResponse::error(id, -32000, format!("Serialization failed: {}", e))
+                        }
                     },
                     Err(e) => RpcResponse::error(id, -32000, format!("Navigation failed: {}", e)),
                 }
@@ -123,7 +126,9 @@ impl JsonRpcHandler {
                 match tab.observe() {
                     Some(obs) => match serde_json::to_value(obs) {
                         Ok(v) => RpcResponse::success(id, v),
-                        Err(e) => RpcResponse::error(id, -32000, format!("Serialization failed: {}", e)),
+                        Err(e) => {
+                            RpcResponse::error(id, -32000, format!("Serialization failed: {}", e))
+                        }
                     },
                     None => RpcResponse::error(id, -32000, "No page loaded. Call navigate first."),
                 }
@@ -134,7 +139,10 @@ impl JsonRpcHandler {
                     Err(e) => return RpcResponse::error(id, -32000, e.to_string()),
                 };
                 let elements = tab.extract_interactive_elements();
-                RpcResponse::success(id, serde_json::json!({ "elements": elements, "count": elements.len() }))
+                RpcResponse::success(
+                    id,
+                    serde_json::json!({ "elements": elements, "count": elements.len() }),
+                )
             }
             "tab.screenshot" | "screenshot" | "Screenshot" => {
                 let tab = match self.get_target_tab_mut(params) {
@@ -144,7 +152,9 @@ impl JsonRpcHandler {
                 match tab.screenshot_async().await {
                     Some(shot) => match serde_json::to_value(shot) {
                         Ok(v) => RpcResponse::success(id, v),
-                        Err(e) => RpcResponse::error(id, -32000, format!("Serialization failed: {}", e)),
+                        Err(e) => {
+                            RpcResponse::error(id, -32000, format!("Serialization failed: {}", e))
+                        }
                     },
                     None => RpcResponse::error(id, -32000, "No page loaded. Call navigate first."),
                 }
@@ -155,7 +165,9 @@ impl JsonRpcHandler {
                     Err(e) => return RpcResponse::error(id, -32000, e.to_string()),
                 };
                 match tab.screenshot_layout() {
-                    Some(layout) => RpcResponse::success(id, serde_json::json!({ "layout": layout })),
+                    Some(layout) => {
+                        RpcResponse::success(id, serde_json::json!({ "layout": layout }))
+                    }
                     None => RpcResponse::error(id, -32000, "No page loaded. Call navigate first."),
                 }
             }
@@ -176,7 +188,10 @@ impl JsonRpcHandler {
                     Err(e) => return RpcResponse::error(id, -32000, e.to_string()),
                 };
                 match tab.extract_markdown(selector) {
-                    Some(markdown) => RpcResponse::success(id, serde_json::json!({ "markdown": markdown, "length": markdown.len() })),
+                    Some(markdown) => RpcResponse::success(
+                        id,
+                        serde_json::json!({ "markdown": markdown, "length": markdown.len() }),
+                    ),
                     None => RpcResponse::error(id, -32000, "No DOM loaded. Call navigate first."),
                 }
             }
@@ -188,9 +203,15 @@ impl JsonRpcHandler {
                 match tab.extract_search_results() {
                     Some(results) => match serde_json::to_value(results) {
                         Ok(v) => RpcResponse::success(id, v),
-                        Err(e) => RpcResponse::error(id, -32000, format!("Serialization failed: {}", e)),
+                        Err(e) => {
+                            RpcResponse::error(id, -32000, format!("Serialization failed: {}", e))
+                        }
                     },
-                    None => RpcResponse::error(id, -32000, "No search results available. Call navigate first."),
+                    None => RpcResponse::error(
+                        id,
+                        -32000,
+                        "No search results available. Call navigate first.",
+                    ),
                 }
             }
             "tab.extractLinks" | "extractLinks" | "ExtractLinks" => {
@@ -199,7 +220,10 @@ impl JsonRpcHandler {
                     Err(e) => return RpcResponse::error(id, -32000, e.to_string()),
                 };
                 let links = tab.extract_links();
-                RpcResponse::success(id, serde_json::json!({ "links": links, "count": links.len() }))
+                RpcResponse::success(
+                    id,
+                    serde_json::json!({ "links": links, "count": links.len() }),
+                )
             }
             "tab.extractForms" | "extractForms" | "ExtractForms" => {
                 let tab = match self.get_target_tab_mut(params) {
@@ -207,7 +231,10 @@ impl JsonRpcHandler {
                     Err(e) => return RpcResponse::error(id, -32000, e.to_string()),
                 };
                 let forms = tab.extract_forms();
-                RpcResponse::success(id, serde_json::json!({ "forms": forms, "count": forms.len() }))
+                RpcResponse::success(
+                    id,
+                    serde_json::json!({ "forms": forms, "count": forms.len() }),
+                )
             }
             "tab.extractDom" | "extractDom" | "ExtractDom" => {
                 let selector = params.get("selector").and_then(|v| v.as_str());
@@ -216,14 +243,24 @@ impl JsonRpcHandler {
                     Err(e) => return RpcResponse::error(id, -32000, e.to_string()),
                 };
                 match tab.extract_dom(selector) {
-                    Some(html) => RpcResponse::success(id, serde_json::json!({ "html": html, "length": html.len() })),
+                    Some(html) => RpcResponse::success(
+                        id,
+                        serde_json::json!({ "html": html, "length": html.len() }),
+                    ),
                     None => RpcResponse::error(id, -32000, "No DOM loaded. Call navigate first."),
                 }
             }
             "tab.click" | "click" | "Click" | "tab.actClick" => {
-                let target = params.get("target")
+                let target = params
+                    .get("target")
                     .or_else(|| params.get("index"))
-                    .map(|v| if v.is_number() { v.to_string() } else { v.as_str().unwrap_or("").to_string() })
+                    .map(|v| {
+                        if v.is_number() {
+                            v.to_string()
+                        } else {
+                            v.as_str().unwrap_or("").to_string()
+                        }
+                    })
                     .unwrap_or_default();
                 if target.is_empty() {
                     return RpcResponse::error(id, -32602, "Missing 'target' or 'index' parameter");
@@ -233,16 +270,28 @@ impl JsonRpcHandler {
                     Err(e) => return RpcResponse::error(id, -32000, e.to_string()),
                 };
                 match tab.act_click(&target).await {
-                    Ok(Some(report)) => RpcResponse::success(id, serde_json::json!({ "action": "navigated", "report": report })),
-                    Ok(None) => RpcResponse::success(id, serde_json::json!({ "action": "clicked_in_page" })),
+                    Ok(Some(report)) => RpcResponse::success(
+                        id,
+                        serde_json::json!({ "action": "navigated", "report": report }),
+                    ),
+                    Ok(None) => {
+                        RpcResponse::success(id, serde_json::json!({ "action": "clicked_in_page" }))
+                    }
                     Err(e) => RpcResponse::error(id, -32000, format!("Click error: {}", e)),
                 }
             }
             "tab.type" | "type" | "Type" | "tab.actType" => {
-                let selector = params.get("selector")
+                let selector = params
+                    .get("selector")
                     .or_else(|| params.get("target"))
                     .or_else(|| params.get("index"))
-                    .map(|v| if v.is_number() { v.to_string() } else { v.as_str().unwrap_or("").to_string() })
+                    .map(|v| {
+                        if v.is_number() {
+                            v.to_string()
+                        } else {
+                            v.as_str().unwrap_or("").to_string()
+                        }
+                    })
                     .unwrap_or_default();
                 let text = params.get("text").and_then(|v| v.as_str()).unwrap_or("");
                 let tab = match self.get_target_tab_mut(params) {
@@ -266,26 +315,43 @@ impl JsonRpcHandler {
                 }
             }
             "tab.setProfile" | "setProfile" | "SetProfile" => {
-                let profile: DeviceProfile = match params.get("profile").and_then(|p| serde_json::from_value(p.clone()).ok()) {
+                let profile: DeviceProfile = match params
+                    .get("profile")
+                    .and_then(|p| serde_json::from_value(p.clone()).ok())
+                {
                     Some(p) => p,
-                    None => return RpcResponse::error(id, -32602, "Invalid or missing 'profile' parameter"),
+                    None => {
+                        return RpcResponse::error(
+                            id,
+                            -32602,
+                            "Invalid or missing 'profile' parameter",
+                        )
+                    }
                 };
                 let tab = match self.get_target_tab_mut(params) {
                     Ok(t) => t,
                     Err(e) => return RpcResponse::error(id, -32000, e.to_string()),
                 };
                 match tab.set_profile(profile) {
-                    Ok(_) => RpcResponse::success(id, serde_json::json!({ "status": "profile_updated", "profile": profile })),
+                    Ok(_) => RpcResponse::success(
+                        id,
+                        serde_json::json!({ "status": "profile_updated", "profile": profile }),
+                    ),
                     Err(e) => RpcResponse::error(id, -32000, format!("SetProfile error: {}", e)),
                 }
             }
             "ping" => RpcResponse::success(id, serde_json::json!({ "pong": true })),
-            "shutdown" | "Shutdown" => RpcResponse::success(id, serde_json::json!({ "status": "shutting down" })),
+            "shutdown" | "Shutdown" => {
+                RpcResponse::success(id, serde_json::json!({ "status": "shutting down" }))
+            }
             _ => RpcResponse::error(id, -32601, format!("Method not found: {}", method)),
         }
     }
 
-    fn get_target_tab_mut(&mut self, params: &serde_json::Value) -> Result<&mut crate::browser::tab::BrowserTab> {
+    fn get_target_tab_mut(
+        &mut self,
+        params: &serde_json::Value,
+    ) -> Result<&mut crate::browser::tab::BrowserTab> {
         if let Some(tab_id) = params.get("tab_id").and_then(|v| v.as_str()) {
             self.engine
                 .get_tab_mut(tab_id)
