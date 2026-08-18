@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo.svg" alt="Headless Engine Logo" width="460">
+  <img src="assets/logo.svg" alt="Headless Engine Logo" width="460">
   <br><br>
 
   <p><strong>A high-performance, lightweight (&lt;30MB RAM) headless browser engine written in Rust for AI agents, web automation, and LLM data ingestion.</strong></p>
@@ -10,7 +10,7 @@
     <a href="https://pypi.org/project/headless-engine/"><img src="https://img.shields.io/pypi/v/headless-engine.svg" alt="PyPI"></a>
     <a href="https://www.npmjs.com/package/headless-engine"><img src="https://img.shields.io/npm/v/headless-engine.svg" alt="npm"></a>
     <img src="https://img.shields.io/badge/RAM-~9.4MB_idle-brightgreen.svg" alt="Memory">
-    <a href="LICENSE-MIT"><img src="https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue.svg" alt="License"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue.svg" alt="License"></a>
   </p>
 </div>
 
@@ -119,11 +119,11 @@ docker run -d --name headless-engine -p 9222:9222 ghcr.io/yutuknown/headless-eng
 ### 6. ⚡ Standalone Binary Installers
 - **Linux & macOS:**
   ```bash
-  curl -fsSL https://raw.githubusercontent.com/yutuknown/headless-engine/master/install.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/yutuknown/headless-engine/master/scripts/install.sh | bash
   ```
 - **Windows PowerShell:**
   ```powershell
-  iwr -useb https://raw.githubusercontent.com/yutuknown/headless-engine/master/install.ps1 | iex
+  iwr -useb https://raw.githubusercontent.com/yutuknown/headless-engine/master/scripts/install.ps1 | iex
   ```
 
 ---

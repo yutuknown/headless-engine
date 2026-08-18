@@ -23,6 +23,8 @@ output.md
 rustup-init.exe
 *.svg
 *.png
+!assets/
+!assets/*
 *.jsonl
 __pycache__/
 
