@@ -5,25 +5,143 @@ Ultra-lightweight (<30MB RAM), detection-free headless browser for AI agents and
 
 import json
 import os
+import platform
 import shutil
 import subprocess
+import sys
+import tarfile
+import tempfile
+import urllib.request
+import zipfile
 from typing import Any, Dict, List, Optional
+
+VERSION = "1.0.0"
+REPO = "yutuknown/headless-engine"
+
+
+def _get_cache_dir() -> str:
+    if platform.system() == "Windows":
+        base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
+        return os.path.join(base, "headless-engine", "bin", f"v{VERSION}")
+    else:
+        return os.path.expanduser(f"~/.cache/headless-engine/bin/v{VERSION}")
+
+
+def _detect_asset_name() -> str:
+    system = platform.system().lower()
+    machine = platform.machine().lower()
+
+    is_arm = machine in ("arm64", "aarch64")
+    is_x86 = machine in ("x86_64", "amd64", "x64")
+
+    if system == "windows":
+        if is_x86 or is_arm:  # Windows ARM runs x86_64 via emulation
+            return "headless-engine-windows-x86_64.zip"
+    elif system == "darwin":
+        if is_arm:
+            return "headless-engine-macos-arm64.tar.gz"
+        elif is_x86:
+            return "headless-engine-macos-x86_64.tar.gz"
+    elif system == "linux":
+        if is_arm:
+            return "headless-engine-linux-arm64.tar.gz"
+        elif is_x86:
+            return "headless-engine-linux-x86_64.tar.gz"
+
+    raise RuntimeError(
+        f"Unsupported platform or architecture: {system} ({machine}). "
+        "Please build from source: https://github.com/yutuknown/headless-engine"
+    )
+
+
+def _download_and_extract(cache_dir: str) -> str:
+    os.makedirs(cache_dir, exist_ok=True)
+    asset_name = _detect_asset_name()
+    download_url = f"https://github.com/{REPO}/releases/download/v{VERSION}/{asset_name}"
+    exe_name = "headless-engine.exe" if platform.system() == "Windows" else "headless-engine"
+    target_bin = os.path.join(cache_dir, exe_name)
+
+    sys.stderr.write(f"[headless-engine] Downloading precompiled engine binary from {download_url}...\n")
+    sys.stderr.flush()
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        archive_path = os.path.join(tmp_dir, asset_name)
+        req = urllib.request.Request(
+            download_url,
+            headers={"User-Agent": "headless-engine-python-sdk"},
+        )
+        with urllib.request.urlopen(req) as resp, open(archive_path, "wb") as f:
+            shutil.copyfileobj(resp, f)
+
+        if asset_name.endswith(".zip"):
+            with zipfile.ZipFile(archive_path, "r") as z:
+                z.extractall(tmp_dir)
+        else:
+            with tarfile.open(archive_path, "r:*") as t:
+                t.extractall(tmp_dir)
+
+        extracted_bin = os.path.join(tmp_dir, exe_name)
+        if not os.path.exists(extracted_bin):
+            for root, _, files in os.walk(tmp_dir):
+                if exe_name in files:
+                    extracted_bin = os.path.join(root, exe_name)
+                    break
+
+        if not os.path.exists(extracted_bin):
+            raise RuntimeError(f"Failed to find {exe_name} inside downloaded archive {asset_name}")
+
+        shutil.move(extracted_bin, target_bin)
+
+    if platform.system() != "Windows":
+        os.chmod(target_bin, 0o755)
+
+    sys.stderr.write(f"[headless-engine] Binary installed successfully to {target_bin}\n")
+    sys.stderr.flush()
+    return target_bin
+
+
+def _resolve_binary(explicit_path: Optional[str] = None) -> str:
+    if explicit_path and os.path.exists(explicit_path):
+        return os.path.abspath(explicit_path)
+
+    env_path = os.environ.get("HEADLESS_ENGINE_BIN")
+    if env_path and os.path.exists(env_path):
+        return os.path.abspath(env_path)
+
+    which_bin = shutil.which("headless-engine") or shutil.which("headless-engine.exe")
+    if which_bin and os.path.exists(which_bin):
+        return os.path.abspath(which_bin)
+
+    local_candidates = [
+        "headless-engine",
+        "headless-engine.exe",
+        "./target/release/headless-engine",
+        "./target/release/headless-engine.exe",
+        "./target/debug/headless-engine",
+        "./target/debug/headless-engine.exe",
+        "../target/release/headless-engine",
+        "../target/release/headless-engine.exe",
+        "../../target/release/headless-engine",
+        "../../target/release/headless-engine.exe",
+    ]
+    for c in local_candidates:
+        if os.path.exists(c):
+            return os.path.abspath(c)
+
+    cache_dir = _get_cache_dir()
+    exe_name = "headless-engine.exe" if platform.system() == "Windows" else "headless-engine"
+    cached_bin = os.path.join(cache_dir, exe_name)
+    if os.path.exists(cached_bin):
+        return cached_bin
+
+    return _download_and_extract(cache_dir)
 
 
 class HeadlessBrowser:
     """Synchronous & context-managed client for Headless Engine."""
 
     def __init__(self, binary_path: Optional[str] = None):
-        self.binary_path = binary_path or self._find_binary()
-        if not self.binary_path or not os.path.exists(self.binary_path):
-            # Check PATH
-            which_bin = shutil.which("headless-engine")
-            if which_bin:
-                self.binary_path = which_bin
-            else:
-                raise FileNotFoundError(
-                    "Could not locate `headless-engine` binary. Please install or provide `binary_path`."
-                )
+        self.binary_path = _resolve_binary(binary_path)
 
         self._process = subprocess.Popen(
             [self.binary_path, "--stdio"],
@@ -36,23 +154,6 @@ class HeadlessBrowser:
             bufsize=1,
         )
         self._req_id = 0
-
-    def _find_binary(self) -> Optional[str]:
-        # Search relative release/debug paths
-        candidates = [
-            "headless-engine",
-            "headless-engine.exe",
-            "./target/release/headless-engine",
-            "./target/release/headless-engine.exe",
-            "./target/debug/headless-engine",
-            "./target/debug/headless-engine.exe",
-            "../target/release/headless-engine",
-            "../target/release/headless-engine.exe",
-        ]
-        for c in candidates:
-            if os.path.exists(c):
-                return os.path.abspath(c)
-        return None
 
     def _call(self, method: str, params: Optional[Dict[str, Any]] = None) -> Any:
         self._req_id += 1
@@ -194,4 +295,4 @@ class HeadlessBrowser:
         self.close()
 
 
-__all__ = ["HeadlessBrowser"]
+__all__ = ["HeadlessBrowser", "VERSION"]

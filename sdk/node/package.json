@@ -1,11 +1,12 @@
 {
   "name": "headless-engine",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Ultra-lightweight (<30MB RAM), detection-free headless browser engine for AI agents, web scraping, and MCP servers.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepack": "npm run build"
   },
   "keywords": [
     "headless-browser",
@@ -15,9 +16,18 @@
     "lightweight",
     "stealth"
   ],
-  "author": "Headless Engine Contributors",
-  "license": "MIT",
+  "author": "Headless Engine Contributors <maintainers@headless-engine.dev>",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yutuknown/headless-engine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yutuknown/headless-engine/issues"
+  },
+  "homepage": "https://github.com/yutuknown/headless-engine#readme",
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.3.0",
+    "@types/node": "^20.0.0"
   }
 }
