@@ -72,7 +72,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: sdk/node
-        run: npm install
+        run: npm install --include=dev
 
       - name: Build TypeScript
         working-directory: sdk/node

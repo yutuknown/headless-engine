@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import * as https from 'https';
+import { IncomingMessage } from 'http';
 
 export const VERSION = '1.0.0';
 export const REPO = 'yutuknown/headless-engine';
@@ -54,8 +55,8 @@ function getCacheDir(): string {
 }
 
 function detectAssetName(): string {
-  const platform = process.platform;
-  const arch = process.arch;
+  const platform = os.platform();
+  const arch = os.arch();
 
   if (platform === 'win32') {
     return 'headless-engine-windows-x86_64.zip';
@@ -66,7 +67,7 @@ function detectAssetName(): string {
       return 'headless-engine-macos-x86_64.tar.gz';
     }
   } else if (platform === 'linux') {
-    if (arch === 'arm64' || arch === 'arm') {
+    if (arch === 'arm64') {
       return 'headless-engine-linux-arm64.tar.gz';
     } else {
       return 'headless-engine-linux-x86_64.tar.gz';
@@ -79,7 +80,7 @@ function detectAssetName(): string {
 function downloadFile(url: string, dest: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const request = (targetUrl: string) => {
-      https.get(targetUrl, { headers: { 'User-Agent': 'headless-engine-node-sdk' } }, (res) => {
+      https.get(targetUrl, { headers: { 'User-Agent': 'headless-engine-node-sdk' } }, (res: IncomingMessage) => {
         if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
           request(res.headers.location);
           return;
@@ -94,7 +95,7 @@ function downloadFile(url: string, dest: string): Promise<void> {
           file.close();
           resolve();
         });
-      }).on('error', (err) => {
+      }).on('error', (err: Error) => {
         fs.unlink(dest, () => {});
         reject(err);
       });
