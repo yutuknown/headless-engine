@@ -59,13 +59,10 @@ jobs:
           Compress-Archive -Path target/${{ matrix.target }}/release/${{ matrix.artifact_name }} -DestinationPath ${{ matrix.asset_name }}
 
       - name: Generate Checksum
-        shell: bash
+        shell: pwsh
         run: |
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            certutil -hashfile ${{ matrix.asset_name }} SHA256 | findstr /v "hash" | findstr /v "CertUtil" | tr -d ' \r\n' > ${{ matrix.asset_name }}.sha256
-          else
-            shasum -a 256 ${{ matrix.asset_name }} | awk '{print $1}' > ${{ matrix.asset_name }}.sha256
-          fi
+          $hash = (Get-FileHash -Path "${{ matrix.asset_name }}" -Algorithm SHA256).Hash.ToLower()
+          Set-Content -Path "${{ matrix.asset_name }}.sha256" -Value $hash -NoNewline
 
       - name: Upload binaries to GitHub Release
         uses: softprops/action-gh-release@v2

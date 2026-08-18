@@ -46,13 +46,13 @@ impl RealBrowserScreenshot {
                 }
             }
             if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
-                let chrome_local =
-                    std::path::Path::new(&local_app_data).join(r"Google\Chrome\Application\chrome.exe");
+                let chrome_local = std::path::Path::new(&local_app_data)
+                    .join(r"Google\Chrome\Application\chrome.exe");
                 if chrome_local.exists() {
                     return Some(chrome_local);
                 }
-                let edge_local =
-                    std::path::Path::new(&local_app_data).join(r"Microsoft\Edge\Application\msedge.exe");
+                let edge_local = std::path::Path::new(&local_app_data)
+                    .join(r"Microsoft\Edge\Application\msedge.exe");
                 if edge_local.exists() {
                     return Some(edge_local);
                 }
