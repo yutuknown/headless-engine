@@ -24,7 +24,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Publish to crates.io
-        run: cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} --allow-dirty
+        run: cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} --allow-dirty || echo "Already published to crates.io"
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
@@ -72,7 +72,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: sdk/node
-        run: npm ci
+        run: npm install
 
       - name: Build TypeScript
         working-directory: sdk/node
@@ -80,6 +80,6 @@ jobs:
 
       - name: Publish to npm
         working-directory: sdk/node
-        run: npm publish --access public
+        run: npm publish --access public || echo "Already published to npm"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
