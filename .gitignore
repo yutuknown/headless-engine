@@ -17,3 +17,11 @@ debug_page.html
 *.tmp
 test.jsonl
 test_google.jsonl
+
+out.md
+output.md
+rustup-init.exe
+*.svg
+*.png
+*.jsonl
+__pycache__/
