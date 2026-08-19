@@ -53,8 +53,8 @@ function getCacheDir() {
     }
 }
 function detectAssetName() {
-    const platform = process.platform;
-    const arch = process.arch;
+    const platform = os.platform();
+    const arch = os.arch();
     if (platform === 'win32') {
         return 'headless-engine-windows-x86_64.zip';
     }
@@ -67,7 +67,7 @@ function detectAssetName() {
         }
     }
     else if (platform === 'linux') {
-        if (arch === 'arm64' || arch === 'arm') {
+        if (arch === 'arm64') {
             return 'headless-engine-linux-arm64.tar.gz';
         }
         else {
