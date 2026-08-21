@@ -107,7 +107,7 @@ impl SearchResults {
                 for s in &ai.source_references {
                     md.push_str(&format!("- [{}]({})\n", s, s));
                 }
-                md.push_str("\n");
+                md.push('\n');
             }
         }
 
@@ -123,7 +123,7 @@ impl SearchResults {
                 for (k, v) in &kp.attributes {
                     md.push_str(&format!("- **{}**: {}\n", k, v));
                 }
-                md.push_str("\n");
+                md.push('\n');
             }
         }
 
@@ -142,7 +142,7 @@ impl SearchResults {
             for q in &self.related_questions {
                 md.push_str(&format!("- {}\n", q));
             }
-            md.push_str("\n");
+            md.push('\n');
         }
 
         md.trim().to_string()

@@ -1,5 +1,3 @@
-use url::Url;
-
 /// Helper to build URLs for various Google and YouTube multimodal capabilities
 pub struct GoogleEndpoints;
 
