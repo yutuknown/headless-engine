@@ -30,6 +30,47 @@ impl Drop for TempFileCleanup {
 }
 
 impl RealBrowserScreenshot {
+    pub async fn dump_rendered_dom(url: &str) -> Option<String> {
+        let browser_bin = Self::find_browser_binary()?;
+        let temp_dir = std::env::temp_dir();
+        let pid = std::process::id();
+        let time = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_millis())
+            .unwrap_or(0);
+        static DUMP_COUNTER: AtomicUsize = AtomicUsize::new(0);
+        let count = DUMP_COUNTER.fetch_add(1, Ordering::Relaxed);
+        let profile_dir = temp_dir.join(format!("headless_engine_dump_{}_{}_{}", pid, time, count));
+        let profile_arg = format!("--user-data-dir={}", profile_dir.to_string_lossy());
+
+        let mut cmd = tokio::process::Command::new(&browser_bin);
+        cmd.arg("--headless=new")
+            .arg("--disable-gpu")
+            .arg("--no-sandbox")
+            .arg(&profile_arg)
+            .arg("--hide-scrollbars")
+            .arg("--run-all-compositor-stages-before-draw")
+            .arg("--disable-blink-features=AutomationControlled")
+            .arg("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
+            .arg("--lang=en-US,en")
+            .arg("--dump-dom")
+            .arg(url);
+
+        #[cfg(target_os = "windows")]
+        cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
+
+        let output = tokio::time::timeout(std::time::Duration::from_secs(12), cmd.output()).await.ok()?.ok()?;
+        let _ = std::fs::remove_dir_all(&profile_dir);
+
+        if output.status.success() && !output.stdout.is_empty() {
+            let html = String::from_utf8_lossy(&output.stdout).to_string();
+            if !html.is_empty() {
+                return Some(html);
+            }
+        }
+        None
+    }
+
     pub fn find_browser_binary() -> Option<PathBuf> {
         #[cfg(target_os = "windows")]
         {
@@ -200,7 +241,7 @@ impl RealBrowserScreenshot {
             temp_html_str
         };
 
-        let profile_dir = std::env::temp_dir().join("headless_engine_stealth_profile");
+        let profile_dir = temp_png.with_extension("profile");
         let profile_arg = format!("--user-data-dir={}", profile_dir.to_string_lossy());
 
         let mut cmd = tokio::process::Command::new(&browser_bin);
@@ -209,10 +250,10 @@ impl RealBrowserScreenshot {
             .arg("--no-sandbox")
             .arg(&profile_arg)
             .arg("--hide-scrollbars")
+            .arg("--run-all-compositor-stages-before-draw")
             .arg("--disable-blink-features=AutomationControlled")
             .arg("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
             .arg("--lang=en-US,en")
-            .arg("--virtual-time-budget=8000")
             .arg(&window_size_arg)
             .arg(&screenshot_arg)
             .arg(&target_arg);
@@ -225,6 +266,8 @@ impl RealBrowserScreenshot {
                 tokio::time::timeout(std::time::Duration::from_secs(12), child.wait_with_output())
                     .await;
         }
+
+        let _ = std::fs::remove_dir_all(&profile_dir);
 
         if temp_png.exists() {
             if let Ok(png_bytes) = std::fs::read(&temp_png) {
@@ -294,7 +337,7 @@ impl RealBrowserScreenshot {
             temp_html_str
         };
 
-        let profile_dir = std::env::temp_dir().join("headless_engine_stealth_profile");
+        let profile_dir = temp_png.with_extension("profile");
         let profile_arg = format!("--user-data-dir={}", profile_dir.to_string_lossy());
 
         let mut cmd = std::process::Command::new(&browser_bin);
@@ -303,10 +346,10 @@ impl RealBrowserScreenshot {
             .arg("--no-sandbox")
             .arg(&profile_arg)
             .arg("--hide-scrollbars")
+            .arg("--run-all-compositor-stages-before-draw")
             .arg("--disable-blink-features=AutomationControlled")
             .arg("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
             .arg("--lang=en-US,en")
-            .arg("--virtual-time-budget=8000")
             .arg(&window_size_arg)
             .arg(&screenshot_arg)
             .arg(&target_arg);

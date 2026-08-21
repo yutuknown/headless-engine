@@ -34,6 +34,39 @@ Traditional headless browsers (such as Puppeteer or Playwright) orchestrate full
 
 ---
 
+## 🚀 31 Multimodal Google & YouTube Capabilities
+
+In `v1.1.0`, we've introduced direct API integrations for 31 specific search and media modalities across Google and YouTube. These endpoints use a **Tiered Stealth Architecture**: defaulting to pure-Rust HTTP/2 extraction for ~18ms latency, with an automated ephemeral compositor fallback (`--dump-dom`) if captchas are encountered.
+
+Each capability yields **Dual Outputs**:
+1. **Strongly Typed Structs** (e.g. `GoogleSearchResult`, `GoogleAutocompleteResult`) for programmatic extraction.
+2. **LLM Distillation**: A `.to_markdown()` method optimized for massive (80-95%) token savings.
+
+### Supported Endpoints
+
+- **General Search**: `google_search`, `google_web_search`, `google_autocomplete`
+- **AI & Vertical**: `google_ai_overview`, `google_ai_mode`
+- **Media & Products**: `google_image_search`, `google_video_search`, `google_short_video_search`, `google_news_search`, `google_forum_search`, `google_shopping_search`, `google_product_search`, `google_books_search`
+- **Travel & Maps**: `google_maps_search`, `google_flights_search`, `google_hotels_search`, `google_travel_explore`
+- **Finance & Academics**: `google_finance_quote`, `google_scholar_search`, `google_patents_search`, `google_trends_search`
+- **YouTube Ecosystem**: `youtube_search`, `youtube_shorts_search`, `youtube_video`, `youtube_channel`, `youtube_playlist`
+- **Google Lens**: `google_lens_visual_matches`, `google_lens_exact_matches`, `google_lens_products`, `google_lens_about_image`
+
+**Example (Rust):**
+```rust
+let mut tab = BrowserTab::new()?;
+let flight_results = tab.google_flights_search("SFO", "JFK").await?;
+println!("{}", flight_results.to_markdown());
+```
+
+**Example (Python SDK via RPC):**
+```python
+res = engine.call_rpc("tab.google_finance_quote", {"tab_id": tab_id, "query": "AAPL"})
+print(res.get("raw_markdown"))
+```
+
+---
+
 ## Installation & Quick Start
 
 ### 1. 🦀 Rust Crate

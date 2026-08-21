@@ -42,6 +42,7 @@
 pub mod api;
 pub mod browser;
 pub mod dom;
+pub mod google;
 pub mod js;
 pub mod network;
 pub mod render;
@@ -54,7 +55,11 @@ pub use dom::markdown::HtmlToMarkdown;
 pub use dom::{
     AiOverview, DomTree, FormInfo, FormInputInfo, ImageResult, InteractiveElement,
     InteractiveParser, KnowledgePanel, LinkInfo, NewsResult, OrganicResult, PageObservation,
-    PageRenderer, ScreenshotResult, SearchResults, VideoResult,
+    PageRenderer, RealBrowserScreenshot, ScreenshotResult, SearchResults, VideoResult,
 };
 pub use network::fingerprint::{DeviceProfile, Fingerprint};
 pub use render::{HtmlRenderer, LayoutEngine, PaintEngine};
+pub use google::{
+    GenericGoogleResult, GoogleAutocompleteResult, GoogleEndpoints, GoogleParser,
+    GoogleSearchResult, OrganicResult as GoogleOrganicResult,
+};

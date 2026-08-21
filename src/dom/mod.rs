@@ -6,7 +6,7 @@ use anyhow::Result;
 pub use interactive::{InteractiveElement, InteractiveParser, PageObservation};
 use markdown::HtmlToMarkdown;
 use scraper::{Html, Selector};
-pub use screenshot::{PageRenderer, ScreenshotResult};
+pub use screenshot::{PageRenderer, RealBrowserScreenshot, ScreenshotResult};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -93,6 +93,62 @@ pub struct SearchResults {
     pub total_results_found: usize,
 }
 
+impl SearchResults {
+    pub fn to_markdown(&self) -> String {
+        let mut md = String::new();
+        md.push_str(&format!("# {}\n\n", self.page_title));
+
+        if let Some(ai) = &self.ai_overview {
+            md.push_str("## ✨ Google AI Overview\n\n");
+            md.push_str(&ai.summary);
+            md.push_str("\n\n");
+            if !ai.source_references.is_empty() {
+                md.push_str("**Sources:**\n");
+                for s in &ai.source_references {
+                    md.push_str(&format!("- [{}]({})\n", s, s));
+                }
+                md.push_str("\n");
+            }
+        }
+
+        if let Some(kp) = &self.knowledge_panel {
+            md.push_str(&format!("## 🏛️ Knowledge Panel: {}\n\n", kp.title));
+            if !kp.subtitle.is_empty() {
+                md.push_str(&format!("*{}*\n\n", kp.subtitle));
+            }
+            if !kp.description.is_empty() {
+                md.push_str(&format!("{}\n\n", kp.description));
+            }
+            if !kp.attributes.is_empty() {
+                for (k, v) in &kp.attributes {
+                    md.push_str(&format!("- **{}**: {}\n", k, v));
+                }
+                md.push_str("\n");
+            }
+        }
+
+        if !self.organic_results.is_empty() {
+            md.push_str("## 🔍 Organic Search Results\n\n");
+            for (i, res) in self.organic_results.iter().enumerate() {
+                md.push_str(&format!("### {}. [{}]({})\n\n", i + 1, res.title, res.link));
+                if !res.snippet.is_empty() {
+                    md.push_str(&format!("{}\n\n", res.snippet));
+                }
+            }
+        }
+
+        if !self.related_questions.is_empty() {
+            md.push_str("## ❓ People Also Ask\n\n");
+            for q in &self.related_questions {
+                md.push_str(&format!("- {}\n", q));
+            }
+            md.push_str("\n");
+        }
+
+        md.trim().to_string()
+    }
+}
+
 pub struct DomTree {
     pub raw_content: String,
     document: Html,
@@ -124,6 +180,16 @@ impl DomTree {
     }
 
     pub fn extract_markdown(&self, selector_str: Option<&str>, base_url: Option<&str>) -> String {
+        if selector_str.is_none() {
+            let search_results = self.parse_google_search_results();
+            if !search_results.organic_results.is_empty()
+                || search_results.ai_overview.is_some()
+                || search_results.knowledge_panel.is_some()
+            {
+                return search_results.to_markdown();
+            }
+        }
+
         if let Some(sel) = selector_str {
             if let Ok(selector) = Selector::parse(sel) {
                 let parts: Vec<String> = self
@@ -627,6 +693,17 @@ impl DomTree {
                     }
                 }
 
+                // Sanitize snippet if it contains inline CSS/JS leaks
+                if snippet.contains("@keyframes") || snippet.contains("var(--") || snippet.contains('{') {
+                    let mut words = Vec::new();
+                    for w in snippet.split_whitespace() {
+                        if !w.contains('{') && !w.contains('}') && !w.contains("var(--") && !w.contains("@keyframes") && !w.contains("display:") && !w.contains("animation:") {
+                            words.push(w);
+                        }
+                    }
+                    snippet = words.join(" ");
+                }
+
                 // Check if this is a video result on Google Videos
                 if clean_url.contains("youtube.com/watch") || clean_url.contains("vimeo.com") {
                     let video_id = if let Some(idx) = clean_url.find("v=") {
@@ -662,13 +739,9 @@ impl DomTree {
                     let source = if parts.len() > 1 {
                         parts[0].trim().to_string()
                     } else {
-                        "Web".to_string()
+                        "Web News".to_string()
                     };
-                    let time_ago = if parts.len() > 1 {
-                        parts[1].trim().to_string()
-                    } else {
-                        snippet.clone()
-                    };
+                    let time_ago = parts.get(1).unwrap_or(&"").trim().to_string();
 
                     if !news_results
                         .iter()
@@ -699,7 +772,13 @@ impl DomTree {
         {
             for q_el in self.document.select(&q_selector) {
                 let q_text = q_el.text().collect::<Vec<_>>().join(" ").trim().to_string();
-                if !q_text.is_empty() && q_text.len() > 5 && !related_questions.contains(&q_text) {
+                if !q_text.is_empty()
+                    && q_text.len() > 5
+                    && q_text.len() < 150
+                    && !q_text.contains('{')
+                    && !q_text.contains("@keyframes")
+                    && !related_questions.contains(&q_text)
+                {
                     related_questions.push(q_text);
                 }
             }

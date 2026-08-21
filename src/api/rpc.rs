@@ -357,6 +357,54 @@ impl JsonRpcHandler {
                     Err(e) => RpcResponse::error(id, -32000, format!("SetProfile error: {}", e)),
                 }
             }
+            method if method.starts_with("tab.google_") || method.starts_with("tab.youtube_") => {
+                let query = params.get("query").and_then(|v| v.as_str()).unwrap_or("");
+                let arg2 = params.get("arg2").and_then(|v| v.as_str()).unwrap_or(""); // For methods taking two args like flights
+                let tab = match self.get_target_tab_mut(params) {
+                    Ok(t) => t,
+                    Err(e) => return RpcResponse::error(id, -32000, e.to_string()),
+                };
+                
+                let result = match method {
+                    "tab.google_search" => tab.google_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_web_search" => tab.google_web_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_image_search" => tab.google_image_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_video_search" => tab.google_video_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_short_video_search" => tab.google_short_video_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_news_search" => tab.google_news_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_forum_search" => tab.google_forum_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_shopping_search" => tab.google_shopping_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_product_search" => tab.google_product_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_books_search" => tab.google_books_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_autocomplete" => tab.google_autocomplete(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_ai_overview" => tab.google_ai_overview(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_ai_mode" => tab.google_ai_mode(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_scholar_search" => tab.google_scholar_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_patents_search" => tab.google_patents_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_maps_search" => tab.google_maps_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_finance_quote" => tab.google_finance_quote(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_trends_search" => tab.google_trends_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_flights_search" => tab.google_flights_search(query, arg2).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_hotels_search" => tab.google_hotels_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_travel_explore" => tab.google_travel_explore(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.youtube_search" => tab.youtube_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.youtube_shorts_search" => tab.youtube_shorts_search(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.youtube_video" => tab.youtube_video(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.youtube_channel" => tab.youtube_channel(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.youtube_playlist" => tab.youtube_playlist(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_lens_visual_matches" => tab.google_lens_visual_matches(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_lens_exact_matches" => tab.google_lens_exact_matches(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_lens_products" => tab.google_lens_products(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_lens_about_image" => tab.google_lens_about_image(query).await.map(|r| serde_json::to_value(r).unwrap()),
+                    "tab.google_capabilities" => Ok(serde_json::to_value(tab.google_capabilities()).unwrap()),
+                    _ => Err(anyhow::anyhow!("Unsupported google/youtube method")),
+                };
+
+                match result {
+                    Ok(val) => RpcResponse::success(id, val),
+                    Err(e) => RpcResponse::error(id, -32000, e.to_string()),
+                }
+            }
             "ping" => RpcResponse::success(id, serde_json::json!({ "pong": true })),
             "shutdown" | "Shutdown" => {
                 RpcResponse::success(id, serde_json::json!({ "status": "shutting down" }))

@@ -58,7 +58,7 @@ impl InteractiveParser {
         let document = Html::parse_document(html_str);
         let mut elements = Vec::new();
 
-        let query = "a[href], button, input, textarea, select, [role='button'], [role='link'], [role='checkbox'], [role='tab'], [onclick]";
+        let query = "a[href], button, input, textarea, select, [contenteditable='true'], [role='button'], [role='link'], [role='checkbox'], [role='tab'], [onclick], [data-testid]";
         let selector = match Selector::parse(query) {
             Ok(s) => s,
             Err(_) => return elements,
@@ -74,6 +74,7 @@ impl InteractiveParser {
             let value = el.value().attr("value").unwrap_or("").to_string();
             let id = el.value().attr("id").unwrap_or("").to_string();
             let class = el.value().attr("class").unwrap_or("").to_string();
+            let is_contenteditable = el.value().attr("contenteditable") == Some("true");
 
             // Skip hidden inputs and disabled elements
             if input_type == "hidden"
@@ -108,11 +109,12 @@ impl InteractiveParser {
                 && placeholder.is_empty()
                 && name.is_empty()
                 && id.is_empty()
+                && !is_contenteditable
             {
                 continue;
             }
 
-            let is_input = tag == "input" || tag == "textarea" || tag == "select";
+            let is_input = tag == "input" || tag == "textarea" || tag == "select" || is_contenteditable || id == "prompt-textarea";
             let is_clickable = tag == "a"
                 || tag == "button"
                 || role == "button"

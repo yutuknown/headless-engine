@@ -1,16 +1,5 @@
-#![allow(dead_code)]
-
-mod api;
-mod browser;
-mod dom;
-mod js;
-mod network;
-mod render;
-
-use api::rpc::JsonRpcHandler;
-use browser::builder::BrowserBuilder;
 use clap::Parser;
-use network::fingerprint::DeviceProfile;
+use headless_engine::*;
 use std::io::{self, BufRead, Write};
 use std::time::{Duration, Instant};
 

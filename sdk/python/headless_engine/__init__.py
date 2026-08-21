@@ -15,7 +15,7 @@ import urllib.request
 import zipfile
 from typing import Any, Dict, List, Optional
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 REPO = "yutuknown/headless-engine"
 
 
@@ -108,13 +108,7 @@ def _resolve_binary(explicit_path: Optional[str] = None) -> str:
     if env_path and os.path.exists(env_path):
         return os.path.abspath(env_path)
 
-    which_bin = shutil.which("headless-engine") or shutil.which("headless-engine.exe")
-    if which_bin and os.path.exists(which_bin):
-        return os.path.abspath(which_bin)
-
     local_candidates = [
-        "headless-engine",
-        "headless-engine.exe",
         "./target/release/headless-engine",
         "./target/release/headless-engine.exe",
         "./target/debug/headless-engine",
@@ -123,10 +117,16 @@ def _resolve_binary(explicit_path: Optional[str] = None) -> str:
         "../target/release/headless-engine.exe",
         "../../target/release/headless-engine",
         "../../target/release/headless-engine.exe",
+        "headless-engine",
+        "headless-engine.exe",
     ]
     for c in local_candidates:
         if os.path.exists(c):
             return os.path.abspath(c)
+
+    which_bin = shutil.which("headless-engine") or shutil.which("headless-engine.exe")
+    if which_bin and os.path.exists(which_bin):
+        return os.path.abspath(which_bin)
 
     cache_dir = _get_cache_dir()
     exe_name = "headless-engine.exe" if platform.system() == "Windows" else "headless-engine"
@@ -177,6 +177,10 @@ class HeadlessBrowser:
             raise RuntimeError(f"Engine RPC Error [{err.get('code')}]: {err.get('message')}")
 
         return resp.get("result")
+
+    def call_rpc(self, method: str, params: Optional[Dict[str, Any]] = None) -> Any:
+        """Call any arbitrary RPC method."""
+        return self._call(method, params)
 
     def navigate(self, url: str, tab_id: Optional[str] = None) -> Dict[str, Any]:
         """Navigates to a URL with full anti-detection HTTP/2 & stealth fingerprint."""
