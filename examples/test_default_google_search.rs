@@ -9,7 +9,9 @@ async fn main() -> Result<()> {
     println!(">>> TESTING GOOGLE AS DEFAULT SEARCH ENGINE (PURE RUST)");
     println!("================================================================================\n");
 
-    let artifact_dir = Path::new(r"C:\Users\abhis\.gemini\antigravity-ide\brain\c08da294-7846-44b1-9403-559e0d23ce0f");
+    let artifact_dir = Path::new(
+        r"C:\Users\abhis\.gemini\antigravity-ide\brain\c08da294-7846-44b1-9403-559e0d23ce0f",
+    );
     let evidence_dir = Path::new("evidence");
     fs::create_dir_all(evidence_dir)?;
 
@@ -17,7 +19,10 @@ async fn main() -> Result<()> {
 
     // 1. Default Google Search
     let query = "headless browser pure rust engine for AI agents";
-    println!("[1/2] Executing default search: tab.search(\"{}\")...", query);
+    println!(
+        "[1/2] Executing default search: tab.search(\"{}\")...",
+        query
+    );
     let nav = tab.search(query).await?;
     println!("  -> Final URL:     {}", nav.final_url);
     println!("  -> Page Title:    {}", nav.page_title);
@@ -36,7 +41,10 @@ async fn main() -> Result<()> {
 
     // 2. Google AI Mode Search
     let ai_query = "Rust programming language concurrency patterns";
-    println!("\n[2/2] Executing Google AI Mode search: tab.search_google(\"{}\", Some(\"ai\"))...", ai_query);
+    println!(
+        "\n[2/2] Executing Google AI Mode search: tab.search_google(\"{}\", Some(\"ai\"))...",
+        ai_query
+    );
     let ai_nav = tab.search_google(ai_query, Some("ai")).await?;
     println!("  -> Final URL:     {}", ai_nav.final_url);
     println!("  -> Page Title:    {}", ai_nav.page_title);

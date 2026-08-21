@@ -1,6 +1,6 @@
 {
   "name": "headless-engine",
-  "version": "1.0.2",
+  "version": "1.1.1",
   "description": "A high-performance, lightweight (<30MB RAM) headless browser engine written in Rust for AI agents, web automation, and LLM data ingestion.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

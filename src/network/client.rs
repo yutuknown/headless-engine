@@ -180,8 +180,14 @@ impl NetworkClient {
             || html.contains("hcaptcha-box");
 
         // If Google serves an anti-bot fallback, hydrate with live rendered DOM
-        if (url.contains("google.com/search") && (html.contains("having trouble accessing Google Search") || html.contains("emsg=SG_REL"))) || is_captcha_detected {
-            if let Some(rendered_html) = crate::dom::screenshot::RealBrowserScreenshot::dump_rendered_dom(url).await {
+        if (url.contains("google.com/search")
+            && (html.contains("having trouble accessing Google Search")
+                || html.contains("emsg=SG_REL")))
+            || is_captcha_detected
+        {
+            if let Some(rendered_html) =
+                crate::dom::screenshot::RealBrowserScreenshot::dump_rendered_dom(url).await
+            {
                 html = rendered_html;
                 status = 200;
                 final_url = url.to_string();

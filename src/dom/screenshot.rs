@@ -59,7 +59,10 @@ impl RealBrowserScreenshot {
         #[cfg(target_os = "windows")]
         cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
 
-        let output = tokio::time::timeout(std::time::Duration::from_secs(12), cmd.output()).await.ok()?.ok()?;
+        let output = tokio::time::timeout(std::time::Duration::from_secs(12), cmd.output())
+            .await
+            .ok()?
+            .ok()?;
         let _ = std::fs::remove_dir_all(&profile_dir);
 
         if output.status.success() && !output.stdout.is_empty() {

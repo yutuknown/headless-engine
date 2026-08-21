@@ -694,10 +694,19 @@ impl DomTree {
                 }
 
                 // Sanitize snippet if it contains inline CSS/JS leaks
-                if snippet.contains("@keyframes") || snippet.contains("var(--") || snippet.contains('{') {
+                if snippet.contains("@keyframes")
+                    || snippet.contains("var(--")
+                    || snippet.contains('{')
+                {
                     let mut words = Vec::new();
                     for w in snippet.split_whitespace() {
-                        if !w.contains('{') && !w.contains('}') && !w.contains("var(--") && !w.contains("@keyframes") && !w.contains("display:") && !w.contains("animation:") {
+                        if !w.contains('{')
+                            && !w.contains('}')
+                            && !w.contains("var(--")
+                            && !w.contains("@keyframes")
+                            && !w.contains("display:")
+                            && !w.contains("animation:")
+                        {
                             words.push(w);
                         }
                     }

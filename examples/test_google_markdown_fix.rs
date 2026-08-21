@@ -8,7 +8,9 @@ use std::path::Path;
 async fn main() -> Result<()> {
     println!(">>> Testing Google Search Distilled Markdown Extraction...");
 
-    let artifact_dir = Path::new(r"C:\Users\abhis\.gemini\antigravity-ide\brain\c08da294-7846-44b1-9403-559e0d23ce0f");
+    let artifact_dir = Path::new(
+        r"C:\Users\abhis\.gemini\antigravity-ide\brain\c08da294-7846-44b1-9403-559e0d23ce0f",
+    );
     let evidence_dir = Path::new("evidence");
 
     let mut tab = BrowserTab::with_profile(DeviceProfile::ChromeWindows)?;

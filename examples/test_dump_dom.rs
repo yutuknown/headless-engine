@@ -12,8 +12,14 @@ async fn main() -> Result<()> {
     if let Some(html) = res {
         println!("  -> Got HTML! Bytes: {}", html.len());
         println!("  -> Contains <h3>: {}", html.contains("<h3"));
-        println!("  -> Contains id=\"search\": {}", html.contains("id=\"search\""));
-        println!("  -> Contains class=\"g\": {}", html.contains("class=\"g\""));
+        println!(
+            "  -> Contains id=\"search\": {}",
+            html.contains("id=\"search\"")
+        );
+        println!(
+            "  -> Contains class=\"g\": {}",
+            html.contains("class=\"g\"")
+        );
     } else {
         println!("  -> dump_rendered_dom returned None!");
     }

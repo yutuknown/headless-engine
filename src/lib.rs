@@ -57,9 +57,9 @@ pub use dom::{
     InteractiveParser, KnowledgePanel, LinkInfo, NewsResult, OrganicResult, PageObservation,
     PageRenderer, RealBrowserScreenshot, ScreenshotResult, SearchResults, VideoResult,
 };
-pub use network::fingerprint::{DeviceProfile, Fingerprint};
-pub use render::{HtmlRenderer, LayoutEngine, PaintEngine};
 pub use google::{
     GenericGoogleResult, GoogleAutocompleteResult, GoogleEndpoints, GoogleParser,
     GoogleSearchResult, OrganicResult as GoogleOrganicResult,
 };
+pub use network::fingerprint::{DeviceProfile, Fingerprint};
+pub use render::{HtmlRenderer, LayoutEngine, PaintEngine};

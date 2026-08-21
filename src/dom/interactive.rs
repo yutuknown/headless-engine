@@ -114,7 +114,11 @@ impl InteractiveParser {
                 continue;
             }
 
-            let is_input = tag == "input" || tag == "textarea" || tag == "select" || is_contenteditable || id == "prompt-textarea";
+            let is_input = tag == "input"
+                || tag == "textarea"
+                || tag == "select"
+                || is_contenteditable
+                || id == "prompt-textarea";
             let is_clickable = tag == "a"
                 || tag == "button"
                 || role == "button"

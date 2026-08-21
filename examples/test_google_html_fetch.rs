@@ -18,8 +18,17 @@ async fn main() -> Result<()> {
         let res = client.fetch(url).await?;
         println!("Status: {}", res.status);
         println!("Bytes:  {}", res.html.len());
-        println!("Contains search results container: {}", res.html.contains("id=\"search\"") || res.html.contains("class=\"g\"") || res.html.contains("<h3") || res.html.contains("id=\"rso\""));
-        println!("Contains fallback/sorry:           {}", res.html.contains("having trouble accessing") || res.html.contains("sorry/index"));
+        println!(
+            "Contains search results container: {}",
+            res.html.contains("id=\"search\"")
+                || res.html.contains("class=\"g\"")
+                || res.html.contains("<h3")
+                || res.html.contains("id=\"rso\"")
+        );
+        println!(
+            "Contains fallback/sorry:           {}",
+            res.html.contains("having trouble accessing") || res.html.contains("sorry/index")
+        );
     }
 
     Ok(())

@@ -5,7 +5,7 @@ use headless_engine::network::fingerprint::DeviceProfile;
 #[tokio::main]
 async fn main() -> Result<()> {
     let mut tab = BrowserTab::with_profile(DeviceProfile::ChromeWindows)?;
-    
+
     let urls = [
         "https://www.google.com/search?q=headless+browser+rust+engine+for+ai+agents&gbv=1",
         "https://www.google.com/search?q=headless+browser+rust+engine+for+ai+agents&udm=14",

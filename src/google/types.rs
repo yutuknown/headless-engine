@@ -33,7 +33,13 @@ impl GoogleSearchResult {
         if !self.organic_results.is_empty() {
             md.push_str("## 🔍 Organic Results\n\n");
             for (i, res) in self.organic_results.iter().enumerate() {
-                md.push_str(&format!("### {}. [{}]({})\n{}\n\n", i + 1, res.title, res.link, res.snippet));
+                md.push_str(&format!(
+                    "### {}. [{}]({})\n{}\n\n",
+                    i + 1,
+                    res.title,
+                    res.link,
+                    res.snippet
+                ));
             }
         }
         if !self.related_questions.is_empty() {

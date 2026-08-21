@@ -11,7 +11,9 @@ async fn main() -> Result<()> {
     println!(">>> HEADLESS ENGINE: VERIFYING SCREENSHOT, MARKDOWN & AGENTIC NAVIGATION");
     println!("================================================================================\n");
 
-    let artifact_dir = Path::new(r"C:\Users\abhis\.gemini\antigravity-ide\brain\c08da294-7846-44b1-9403-559e0d23ce0f");
+    let artifact_dir = Path::new(
+        r"C:\Users\abhis\.gemini\antigravity-ide\brain\c08da294-7846-44b1-9403-559e0d23ce0f",
+    );
     let evidence_dir = Path::new("evidence");
     fs::create_dir_all(evidence_dir)?;
     if !artifact_dir.exists() {
@@ -33,14 +35,27 @@ async fn main() -> Result<()> {
 
     // Extract Agent Action Map / Observation Tree
     let obs = tab.observe().expect("Expected observation");
-    println!("  -> Total Interactive Elements Indexed: {}", obs.interactive_elements.len());
+    println!(
+        "  -> Total Interactive Elements Indexed: {}",
+        obs.interactive_elements.len()
+    );
 
     // Agent decision: find an informative article link to click
     let selected_target = obs
         .interactive_elements
         .iter()
-        .find(|e| e.tag == "a" && e.text.len() > 15 && !e.href.is_empty() && !e.href.contains("#") && !e.href.contains("Portal:"))
-        .or_else(|| obs.interactive_elements.iter().find(|e| e.tag == "a" && e.text.contains("article")))
+        .find(|e| {
+            e.tag == "a"
+                && e.text.len() > 15
+                && !e.href.is_empty()
+                && !e.href.contains("#")
+                && !e.href.contains("Portal:")
+        })
+        .or_else(|| {
+            obs.interactive_elements
+                .iter()
+                .find(|e| e.tag == "a" && e.text.contains("article"))
+        })
         .or_else(|| obs.interactive_elements.first())
         .expect("No interactive link found");
 
@@ -56,14 +71,19 @@ async fn main() -> Result<()> {
     println!("  -> Target URL:          {}", clicked_href);
 
     // Execute Autonomous Action Click via element index
-    let nav_report = tab.act_click(&clicked_index.to_string()).await?
+    let nav_report = tab
+        .act_click(&clicked_index.to_string())
+        .await?
         .expect("Expected navigation report after click");
 
     println!("\n  [Agent Navigation Result]");
     println!("  -> Successfully Navigated to: {}", nav_report.final_url);
     println!("  -> New Page Title:            {}", nav_report.page_title);
     println!("  -> HTTP Status:               {}", nav_report.status);
-    println!("  -> HTML Payload Size:         {} bytes", nav_report.html_bytes);
+    println!(
+        "  -> HTML Payload Size:         {} bytes",
+        nav_report.html_bytes
+    );
 
     // Save Agent Action Map
     let sample_elements: Vec<_> = obs.interactive_elements.iter().take(20).cloned().collect();
@@ -87,13 +107,21 @@ async fn main() -> Result<()> {
         },
         "sample_indexed_elements": sample_elements
     });
-    fs::write(evidence_dir.join("agentic_navigation_trace.json"), serde_json::to_string_pretty(&agent_map_json)?)?;
-    fs::write(artifact_dir.join("agentic_navigation_trace.json"), serde_json::to_string_pretty(&agent_map_json)?)?;
+    fs::write(
+        evidence_dir.join("agentic_navigation_trace.json"),
+        serde_json::to_string_pretty(&agent_map_json)?,
+    )?;
+    fs::write(
+        artifact_dir.join("agentic_navigation_trace.json"),
+        serde_json::to_string_pretty(&agent_map_json)?,
+    )?;
 
     // =========================================================================
     // 2. SCREENSHOT FEATURE
     // =========================================================================
-    println!("\n[2. SCREENSHOT FEATURE] Capturing high-resolution visual screenshot & vector SVG...");
+    println!(
+        "\n[2. SCREENSHOT FEATURE] Capturing high-resolution visual screenshot & vector SVG..."
+    );
     let shot = tab.screenshot_async().await.expect("Expected screenshot");
     println!("  -> Dimensions:        {}x{} px", shot.width, shot.height);
     println!("  -> Elements Rendered: {}", shot.element_count);
@@ -109,12 +137,18 @@ async fn main() -> Result<()> {
     if !shot.png_bytes.is_empty() {
         fs::write(&png_dest_evidence, &shot.png_bytes)?;
         fs::write(&png_dest_artifact, &shot.png_bytes)?;
-        println!("  -> Saved PNG Screenshot to: {}", png_dest_evidence.display());
+        println!(
+            "  -> Saved PNG Screenshot to: {}",
+            png_dest_evidence.display()
+        );
     }
     fs::write(&svg_dest_evidence, &shot.svg)?;
     fs::write(&svg_dest_artifact, &shot.svg)?;
     fs::write(&wireframe_dest, &shot.layout_wireframe)?;
-    println!("  -> Saved SVG Vector Layout to: {}", svg_dest_evidence.display());
+    println!(
+        "  -> Saved SVG Vector Layout to: {}",
+        svg_dest_evidence.display()
+    );
 
     // =========================================================================
     // 3. MARKDOWN DISTILLATION FEATURE
@@ -129,15 +163,26 @@ async fn main() -> Result<()> {
         0.0
     };
 
-    println!("  -> Raw HTML Payload:      {} bytes (~{} tokens)", raw_html_len, raw_html_len / 4);
-    println!("  -> Distilled Markdown:    {} bytes (~{} tokens)", md_len, md_len / 4);
+    println!(
+        "  -> Raw HTML Payload:      {} bytes (~{} tokens)",
+        raw_html_len,
+        raw_html_len / 4
+    );
+    println!(
+        "  -> Distilled Markdown:    {} bytes (~{} tokens)",
+        md_len,
+        md_len / 4
+    );
     println!("  -> Token/Size Reduction:  {:.2}%", reduction_pct);
 
     let md_dest_evidence = evidence_dir.join("demonstration_distilled.md");
     let md_dest_artifact = artifact_dir.join("demonstration_distilled.md");
     fs::write(&md_dest_evidence, &markdown)?;
     fs::write(&md_dest_artifact, &markdown)?;
-    println!("  -> Saved Distilled Markdown to: {}", md_dest_evidence.display());
+    println!(
+        "  -> Saved Distilled Markdown to: {}",
+        md_dest_evidence.display()
+    );
 
     // Preview Markdown header
     println!("\n>>> DISTILLED MARKDOWN PREVIEW (FIRST 400 CHARS):");
@@ -182,8 +227,14 @@ async fn main() -> Result<()> {
         }
     });
 
-    fs::write(evidence_dir.join("demonstration_summary.json"), serde_json::to_string_pretty(&summary)?)?;
-    fs::write(artifact_dir.join("demonstration_summary.json"), serde_json::to_string_pretty(&summary)?)?;
+    fs::write(
+        evidence_dir.join("demonstration_summary.json"),
+        serde_json::to_string_pretty(&summary)?,
+    )?;
+    fs::write(
+        artifact_dir.join("demonstration_summary.json"),
+        serde_json::to_string_pretty(&summary)?,
+    )?;
 
     println!("\n================================================================================");
     println!(">>> ALL 3 FEATURES SUCCESSFULLY DEMONSTRATED AND EVIDENCE ARTIFACTS SAVED!");

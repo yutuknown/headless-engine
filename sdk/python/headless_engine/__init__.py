@@ -15,7 +15,7 @@ import urllib.request
 import zipfile
 from typing import Any, Dict, List, Optional
 
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 REPO = "yutuknown/headless-engine"
 
 

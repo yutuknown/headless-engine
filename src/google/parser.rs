@@ -1,5 +1,7 @@
 use crate::dom::DomTree;
-use crate::google::types::{GenericGoogleResult, GoogleAutocompleteResult, GoogleSearchResult, OrganicResult};
+use crate::google::types::{
+    GenericGoogleResult, GoogleAutocompleteResult, GoogleSearchResult, OrganicResult,
+};
 use serde_json::Value;
 
 pub struct GoogleParser;
@@ -8,18 +10,22 @@ impl GoogleParser {
     pub fn parse_search_results(html: &str, url: &str) -> GoogleSearchResult {
         let dom = match DomTree::parse(html) {
             Ok(d) => d,
-            Err(_) => return GoogleSearchResult {
-                query: url.to_string(),
-                title: "Google Search (Parse Error)".to_string(),
-                ..Default::default()
+            Err(_) => {
+                return GoogleSearchResult {
+                    query: url.to_string(),
+                    title: "Google Search (Parse Error)".to_string(),
+                    ..Default::default()
+                }
             }
         };
-        
-        let title = dom.extract(Some("title")).unwrap_or_else(|| "Google Search".to_string());
-        
+
+        let title = dom
+            .extract(Some("title"))
+            .unwrap_or_else(|| "Google Search".to_string());
+
         // This leverages the existing SearchResults logic implicitly or we build it explicitly.
         let search_results = dom.parse_google_search_results();
-        
+
         let mut organic = Vec::new();
         for res in search_results.organic_results {
             organic.push(OrganicResult {
@@ -28,7 +34,7 @@ impl GoogleParser {
                 snippet: res.snippet,
             });
         }
-        
+
         GoogleSearchResult {
             query: url.to_string(), // In a real app we'd parse the URL q= param
             title,
@@ -66,13 +72,17 @@ impl GoogleParser {
     pub fn parse_generic(html: &str, url: &str) -> GenericGoogleResult {
         let dom = match DomTree::parse(html) {
             Ok(d) => d,
-            Err(_) => return GenericGoogleResult {
-                query: url.to_string(),
-                title: "Parse Error".to_string(),
-                raw_markdown: "Error parsing HTML".to_string(),
+            Err(_) => {
+                return GenericGoogleResult {
+                    query: url.to_string(),
+                    title: "Parse Error".to_string(),
+                    raw_markdown: "Error parsing HTML".to_string(),
+                }
             }
         };
-        let title = dom.extract(Some("title")).unwrap_or_else(|| "Google Result".to_string());
+        let title = dom
+            .extract(Some("title"))
+            .unwrap_or_else(|| "Google Result".to_string());
         let md = dom.extract_markdown(None, Some(url));
         GenericGoogleResult {
             query: url.to_string(),
